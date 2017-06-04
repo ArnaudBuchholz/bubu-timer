@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <meta name="viewport" content="initial-scale=1.0">
+        <style>
+
+#new_timer td {
+    font-size: 48pt;
+    text-align: center;
+}
+
+#digits td {
+    font-size: 72pt;
+}
+
+#timer {
+    width: 100%;
+    text-align: center;
+    font-size: 72pt;
+}
+
+#play {
+    width: 64pt;
+    height: 64pt;
+    background-color: green;
+    border-radius:  50%;
+    font-size: 32pt;
+    text-align: center;
+}
+
+        </style>
+        <script language="JavaScript">
+
+var alarm1 = new Audio("alarm1.mp3"),
+    alarm2 = new Audio("alarm2.mp3"),
+    timer;
+
+function start () {
+    alarm2.play();
+    var from = 10;
+    timer = setInterval(function () {
+        --from;
+        document.getElementById("timer").innerText = Math.floor(from / 60) + ":" + (from % 60);
+        if (from === 5) {
+            alarm1.play();
+        }
+        if (from === 0) {
+            alarm2.play();
+            clearInterval(timer);
+        }
+    }, 1000);
+}
+
+function onLoad() {
+    document.getElementById("play").addEventListener("click", function () {
+        start();
+    });
+}
+// Initial 5 addtional seconds to have time to setup
+
+        </script>
+    </head>
+    <body onload="onLoad()">
+
+        <ul>
+            <li>02:00</li>
+            <li>00:30</li>
+            <li>01:00</li>
+            <li>00:30</li>
+        </ul>
+        <table id="new_timer" width="100%" border="1">
+            <tr><td>&#9206;</td><td>&#9206;</td><td>&nbsp;</td><td>&#9206;</td><td>&#9206;</td></tr>
+            <tr id="digits"><td>0</td><td>0</td><td>:</td><td>0</td><td>0</td></tr>
+            <tr><td>&#9207;</td><td>&#9207;</td><td>&nbsp;</td><td>&#9207;</td><td>&#9207;</td></tr>
+        </table>
+        <div id="timer">01:30</div>
+        <div id="play">&#9658;</div>
+
+    </body>
+</html>
