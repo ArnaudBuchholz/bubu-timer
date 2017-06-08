@@ -18,7 +18,7 @@
     font-size: 72pt;
 }
 
-#play {
+#start {
     width: 64pt;
     height: 64pt;
     background-color: green;
@@ -34,12 +34,25 @@ var alarm1 = new Audio("alarm1.mp3"),
     alarm2 = new Audio("alarm2.mp3"),
     timer;
 
+function show (digits) {
+    var digitsTd = document.querySelectorAll("#digits td");
+    [10, 6,, 10, 1000].forEach(function (factor, index) {
+        if (!factor) {
+            return;
+        }
+        var digit = digits % factor;
+        digits = (digits - digit) / factor;
+        digitsTd[digitsTd.length - index - 1].innerHTML = digit;
+    });
+}
+
 function start () {
     alarm2.play();
-    var from = 10;
+    var from = 90;
+    show(from);
     timer = setInterval(function () {
         --from;
-        document.getElementById("timer").innerText = Math.floor(from / 60) + ":" + (from % 60);
+        show(from);
         if (from === 5) {
             alarm1.play();
         }
@@ -51,8 +64,21 @@ function start () {
 }
 
 function onLoad() {
-    document.getElementById("play").addEventListener("click", function () {
-        start();
+    document.addEventListener("click", function (e) {
+        var target = e.target;
+        if (target.id === "start") {
+            start();
+        }
+        var parent = target.parentNode,
+            sibling = target,
+            position = 0;
+        if (parent.id) {
+            while (sibling !== parent.firstChild) {
+                sibling = sibling.previousSibling;
+                ++position;
+            }
+            alert(parent.id + " " + position);
+        }
     });
 }
 // Initial 5 addtional seconds to have time to setup
@@ -67,13 +93,13 @@ function onLoad() {
             <li>01:00</li>
             <li>00:30</li>
         </ul>
-        <table id="new_timer" width="100%" border="1">
-            <tr><td>&#9206;</td><td>&#9206;</td><td>&nbsp;</td><td>&#9206;</td><td>&#9206;</td></tr>
+        <table id="new_timer" width="100%">
+            <tr id="inc"><td>&#9206;</td><td>&#9206;</td><td>&nbsp;</td><td>&#9206;</td><td>&#9206;</td></tr>
             <tr id="digits"><td>0</td><td>0</td><td>:</td><td>0</td><td>0</td></tr>
-            <tr><td>&#9207;</td><td>&#9207;</td><td>&nbsp;</td><td>&#9207;</td><td>&#9207;</td></tr>
+            <tr id="dec"><td>&#9207;</td><td>&#9207;</td><td>&nbsp;</td><td>&#9207;</td><td>&#9207;</td></tr>
         </table>
-        <div id="timer">01:30</div>
-        <div id="play">&#9658;</div>
-
+        <div>
+            <div id="start">&#9658;</div>
+        </div>
     </body>
 </html>
