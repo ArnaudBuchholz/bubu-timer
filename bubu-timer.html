@@ -32,7 +32,7 @@
 
 var alarm1 = new Audio("alarm1.mp3"),
     alarm2 = new Audio("alarm2.mp3"),
-    timer;
+    seconds = 0;
 
 function show (digits) {
     var digitsTd = document.querySelectorAll("#digits td");
@@ -63,30 +63,50 @@ function start () {
     }, 1000);
 }
 
+function _correctSeconds(index, sign) {
+    var diff = [600, 60,, 10, 1][index];
+    if (diff) {
+        var newValueForSeconds = seconds + sign * diff;
+        if (newValueForSeconds <= 0) {
+            newValueForSeconds = 0;
+        }
+        seconds = newValueForSeconds;
+        show(seconds);
+    }
+}
+
+function inc (e, index) {
+    _correctSeconds(index, 1);
+}
+
+function dec (e, index) {
+    _correctSeconds(index, -1);
+}
+
 function onLoad() {
     document.addEventListener("click", function (e) {
         var target = e.target;
-        if (target.id === "start") {
-            start();
+        if ("function" === typeof window[target.id]) {
+            window[target.id](e);
         }
         var parent = target.parentNode,
             sibling = target,
             position = 0;
-        if (parent.id) {
+        if (parent.id && "function" === typeof window[parent.id]) {
             while (sibling !== parent.firstChild) {
                 sibling = sibling.previousSibling;
                 ++position;
             }
-            alert(parent.id + " " + position);
+            window[parent.id](e, position);
         }
     });
+    show(seconds);
 }
 // Initial 5 addtional seconds to have time to setup
 
         </script>
     </head>
     <body onload="onLoad()">
-
         <ul>
             <li>02:00</li>
             <li>00:30</li>
