@@ -32,7 +32,8 @@
 
 var alarm1 = new Audio("alarm1.mp3"),
     alarm2 = new Audio("alarm2.mp3"),
-    seconds = 0;
+    seconds = 0,
+    running;
 
 function show (digits) {
     var digitsTd = document.querySelectorAll("#digits td");
@@ -47,20 +48,25 @@ function show (digits) {
 }
 
 function start () {
-    alarm2.play();
-    var from = 90;
-    show(from);
-    timer = setInterval(function () {
-        --from;
+    if (running) {
+        clearInterval(running);
+        running = 0;
+    } else {
+        alarm2.play();
+        var from = seconds;
         show(from);
-        if (from === 5) {
-            alarm1.play();
-        }
-        if (from === 0) {
-            alarm2.play();
-            clearInterval(timer);
-        }
-    }, 1000);
+        running = setInterval(function () {
+            --from;
+            show(from);
+            if (from === 5) {
+                alarm1.play();
+            }
+            if (from === 0) {
+                alarm2.play();
+                clearInterval(running);
+            }
+        }, 1000);
+    }
 }
 
 function _correctSeconds(index, sign) {
@@ -107,12 +113,14 @@ function onLoad() {
         </script>
     </head>
     <body onload="onLoad()">
+<!--
         <ul>
             <li>02:00</li>
             <li>00:30</li>
             <li>01:00</li>
             <li>00:30</li>
         </ul>
+-->
         <table id="new_timer" width="100%">
             <tr id="inc"><td>&#9206;</td><td>&#9206;</td><td>&nbsp;</td><td>&#9206;</td><td>&#9206;</td></tr>
             <tr id="digits"><td>0</td><td>0</td><td>:</td><td>0</td><td>0</td></tr>
