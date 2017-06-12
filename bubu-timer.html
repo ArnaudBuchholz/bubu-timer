@@ -18,6 +18,13 @@
     font-size: 72pt;
 }
 
+#add {
+    width: 100%;
+    background-color: orange;
+    font-size: 32pt;
+    text-align: center;
+}
+
 #start {
     width: 64pt;
     height: 64pt;
@@ -27,12 +34,28 @@
     text-align: center;
 }
 
+ul#sequence li {
+    display: inline-block;
+    font-size: 24pt;
+    text-align: center;
+    background-color: gray;
+    border: solid 1px black;
+    border-radius: 4pt;
+    margin: 1pt;
+}
+
+ul#sequence li::before {
+    content: "-"
+}
+
+
         </style>
         <script language="JavaScript">
 
 var alarm1 = new Audio("alarm1.mp3"),
     alarm2 = new Audio("alarm2.mp3"),
     seconds = 0,
+    sequence = [],
     running;
 
 function show (digits) {
@@ -53,23 +76,32 @@ function start () {
         running = 0;
     } else {
         alarm2.play();
-        var from = seconds;
-        show(from);
+        var localSequence = [].concat(sequence), // TODO repeat as many time as necessary
+            localSeconds,
+            paused = false;
         running = setInterval(function () {
-            --from;
-            show(from);
-            if (from === 5) {
+            if (!localSeconds) {
+                localSeconds = localSequence.shift();
+                if (!localSeconds) {
+                    clearInterval(running);
+                    running = 0;
+                    return;
+                }
+            } else {
+                --localSeconds;
+            }
+            show(localSeconds);
+            if (localSeconds === 5) {
                 alarm1.play();
             }
-            if (from === 0) {
+            if (localSeconds === 0) {
                 alarm2.play();
-                clearInterval(running);
             }
         }, 1000);
     }
 }
 
-function _correctSeconds(index, sign) {
+function _adjustSeconds (index, sign) {
     var diff = [600, 60,, 10, 1][index];
     if (diff) {
         var newValueForSeconds = seconds + sign * diff;
@@ -82,11 +114,30 @@ function _correctSeconds(index, sign) {
 }
 
 function inc (e, index) {
-    _correctSeconds(index, 1);
+    _adjustSeconds(index, 1);
 }
 
 function dec (e, index) {
-    _correctSeconds(index, -1);
+    _adjustSeconds(index, -1);
+}
+
+function refreshSequence () {
+    document.getElementById("sequence").innerHTML = sequence.map(function (itemSeconds) {
+        var mins = Math.floor(itemSeconds/ 60),
+            secs = itemSeconds % 60,
+            label;
+        if (secs < 10) {
+            label =  mins + ":0" + secs;
+        } else {
+            label =  mins + ":" + secs;
+        }
+        return "<li>" + label + "</li>";
+    }).join("");
+}
+
+function add() {
+    sequence.push(seconds);
+    refreshSequence();
 }
 
 function onLoad() {
@@ -113,21 +164,17 @@ function onLoad() {
         </script>
     </head>
     <body onload="onLoad()">
-<!--
-        <ul>
-            <li>02:00</li>
-            <li>00:30</li>
-            <li>01:00</li>
-            <li>00:30</li>
-        </ul>
--->
         <table id="new_timer" width="100%">
             <tr id="inc"><td>&#9206;</td><td>&#9206;</td><td>&nbsp;</td><td>&#9206;</td><td>&#9206;</td></tr>
             <tr id="digits"><td>0</td><td>0</td><td>:</td><td>0</td><td>0</td></tr>
             <tr id="dec"><td>&#9207;</td><td>&#9207;</td><td>&nbsp;</td><td>&#9207;</td><td>&#9207;</td></tr>
         </table>
         <div>
+            <div id="add">+</div>
+        </div>
+        <div>
             <div id="start">&#9658;</div>
         </div>
+        <ul id="sequence"></ul>
     </body>
 </html>
