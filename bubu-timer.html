@@ -12,17 +12,27 @@
     font-size: 72pt;
 }
 
-#timer {
-    width: 100%;
+#toolbar {
     text-align: center;
-    font-size: 72pt;
+}
+
+#toolbar div {
+    display: inline-block;
+    width: 20%;
+    font-size: 32pt;
+    text-align: center;
 }
 
 #add {
-    width: 100%;
     background-color: orange;
-    font-size: 32pt;
-    text-align: center;
+}
+
+#repeatLess {
+    background-color: red;
+}
+
+#repeatMore {
+    background-color: green;
 }
 
 #start {
@@ -48,6 +58,9 @@ ul#sequence li::before {
     content: "-"
 }
 
+.running .action {
+    display: none;
+}
 
         </style>
         <script language="JavaScript">
@@ -56,6 +69,7 @@ var alarm1 = new Audio("alarm1.mp3"),
     alarm2 = new Audio("alarm2.mp3"),
     seconds = 0,
     sequence = [],
+    repeat = 1,
     running;
 
 function show (digits) {
@@ -75,6 +89,7 @@ function start () {
         clearInterval(running);
         running = 0;
     } else {
+        document.body.className = "running";
         alarm2.play();
         var localSequence = [].concat(sequence), // TODO repeat as many time as necessary
             localSeconds,
@@ -85,6 +100,7 @@ function start () {
                 if (!localSeconds) {
                     clearInterval(running);
                     running = 0;
+                    document.body.className = "";
                     return;
                 }
             } else {
@@ -165,12 +181,15 @@ function onLoad() {
     </head>
     <body onload="onLoad()">
         <table id="new_timer" width="100%">
-            <tr id="inc"><td>&#9206;</td><td>&#9206;</td><td>&nbsp;</td><td>&#9206;</td><td>&#9206;</td></tr>
+            <tr id="inc" class="action"><td>&#9206;</td><td>&#9206;</td><td>&nbsp;</td><td>&#9206;</td><td>&#9206;</td></tr>
             <tr id="digits"><td>0</td><td>0</td><td>:</td><td>0</td><td>0</td></tr>
-            <tr id="dec"><td>&#9207;</td><td>&#9207;</td><td>&nbsp;</td><td>&#9207;</td><td>&#9207;</td></tr>
+            <tr id="dec" class="action"><td>&#9207;</td><td>&#9207;</td><td>&nbsp;</td><td>&#9207;</td><td>&#9207;</td></tr>
         </table>
-        <div>
-            <div id="add">+</div>
+        <div id="toolbar">
+            <div id="add" class="action">+</div>
+            <div id="repeatLess" class="action">-</div>
+            <div id="repeat">1</div>
+            <div id="repeatMore" class="action">+</div>
         </div>
         <div>
             <div id="start">&#9658;</div>
