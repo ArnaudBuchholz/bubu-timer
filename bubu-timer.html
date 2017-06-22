@@ -35,7 +35,8 @@
     background-color: green;
 }
 
-#start {
+.controls div {
+    display: inline-block;
     width: 64pt;
     height: 64pt;
     background-color: green;
@@ -62,6 +63,23 @@ ul#sequence li::before {
     display: none;
 }
 
+#pause {
+    display: none;
+}
+
+.running #play {
+    display: none;
+}
+
+.running #pause {
+    display: inline-block;
+    background-color: orange;
+}
+
+#stop {
+    background-color: red;
+}
+
         </style>
         <script language="JavaScript">
 
@@ -70,7 +88,8 @@ var alarm1 = new Audio("alarm1.mp3"),
     seconds = 0,
     sequence = [],
     repeat = 1,
-    running;
+    running,
+    paused = false;
 
 function show (digits) {
     var digitsTd = document.querySelectorAll("#digits td");
@@ -84,17 +103,23 @@ function show (digits) {
     });
 }
 
-function start () {
-    if (running) {
-        clearInterval(running);
-        running = 0;
+function pause () {
+    paused = true;
+}
+
+function play () {
+    document.body.className = "running";
+    if (paused) {
+        paused = false;
     } else {
-        document.body.className = "running";
         alarm2.play();
         var localSequence = [].concat(sequence), // TODO repeat as many time as necessary
             localSeconds,
             paused = false;
         running = setInterval(function () {
+            if (paused) {
+                return;
+            }
             if (!localSeconds) {
                 localSeconds = localSequence.shift();
                 if (!localSeconds) {
@@ -191,8 +216,10 @@ function onLoad() {
             <div id="repeat">1</div>
             <div id="repeatMore" class="action">+</div>
         </div>
-        <div>
-            <div id="start">&#9658;</div>
+        <div class="controls">
+            <div id="play">&#9658;</div>
+            <div id="pause">&#9208;</div>
+            <div id="stop">&#9209;</div>
         </div>
         <ul id="sequence"></ul>
     </body>
