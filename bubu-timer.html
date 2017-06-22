@@ -5,25 +5,47 @@
         <!--<script language="JavaScript" src="bubu-timer.js" />-->
         <script language="JavaScript">
 
+/*global timer*/
+
 var alarm1 = new Audio("alarm1.mp3"),
     alarm2 = new Audio("alarm2.mp3"),
+
+    ui = {
+
+        show: function (seconds) {
+
+            var
+                remainingSeconds = seconds,
+                digitsTd = document.querySelectorAll("#digits td");
+            [10, 6,, 10, 1000].forEach(function (factor, index) {
+                if (!factor) {
+                    return;
+                }
+                var digit = remainingSeconds % factor;
+                remainingSeconds = (remainingSeconds - digit) / factor;
+                digitsTd[digitsTd.length - index - 1].innerHTML = digit;
+            });
+
+        },
+
+        notify: function (event) {
+            if (timer.PAUSED === event) {
+
+            }
+            if (remainingSeconds === 5) {
+                alarm1.play();
+            } else if (remainingSeconds === 0) {
+                alarm2.play();
+            }
+        }
+
+    };
+
     seconds = 0,
     sequence = [],
     repeat = 1,
     running,
     paused = false;
-
-function show (digits) {
-    var digitsTd = document.querySelectorAll("#digits td");
-    [10, 6,, 10, 1000].forEach(function (factor, index) {
-        if (!factor) {
-            return;
-        }
-        var digit = digits % factor;
-        digits = (digits - digit) / factor;
-        digitsTd[digitsTd.length - index - 1].innerHTML = digit;
-    });
-}
 
 function pause () {
     paused = true;
