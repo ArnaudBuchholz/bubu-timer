@@ -1,0 +1,23 @@
+{
+  "name": "bubu-timer",
+  "version": "0.0.1",
+  "description": "A configurable app-like timer",
+  "main": "bubu-timer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArnaudBuchholz/bubu-timer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ArnaudBuchholz/bubu-timer/issues"
+  },
+  "homepage": "https://github.com/ArnaudBuchholz/bubu-timer#readme",
+  "devDependencies": {
+    "webpack": "^3.3.0"
+  }
+}
