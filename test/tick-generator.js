@@ -79,4 +79,39 @@ describe("tick-generator", function () {
         }, 100);
     });
 
+    it("stops measuring time on pause", (done) => {
+        let ticker = tickGenerator.allocate(),
+            ticked = 0;
+        ticker.on((tick) => {
+            try {
+                if (2 < ticked) {
+                    assert(100 <= tick.elapsed);
+                    assert(200 >= tick.elapsed);
+                }
+                if (2 === ticked) {
+                    assert(tick.paused === false);
+                }
+                if (3 === ticked) {
+                    assert(tick.paused === true);
+                }
+                if (5 === ++ticked) {
+                    done();
+                }
+            } catch (e) {
+                console.log(e);
+                done(e);
+            }
+        });
+        ticker.resume();
+        setTimeout(function () {
+            ticker.pause();
+            setTimeout(function () {
+                ticker.tick();
+                setTimeout(function () {
+                    ticker.tick();
+                }, 100);
+            }, 100);
+        }, 100);
+    });
+
 });
