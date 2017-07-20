@@ -1,9 +1,8 @@
 "use strict";
 
 const
-    _allocate = (sequence) => {
+    _allocate = () => {
         return {
-            sequence: sequence,
             active: false,
             elapsed: 0,
             lastTick: new Date(),
@@ -11,48 +10,58 @@ const
         }
     },
 
-    _notify = (that) => {
-        that.callback({
-            paused: !that.active
+    _notify = (ticker, active) => {
+        let now = new Date();
+        if (ticker.active) {
+            ticker.elapsed += now - ticker.lastTick;
+        }
+        ticker.lastTick = now;
+        ticker.callback({
+            paused: !ticker.active,
+            elapsed: ticker.elapsed
         });
+        if (undefined !== active) {
+            ticker.active = active;
+        }
     },
 
-    _tick = (that) => {
+    _tick = (ticker) => {
+        _notify(ticker);
     },
 
-    _pause = (that) => {
+    _pause = (ticker) => {
+        _notify(ticker, false);
     },
 
-    _resume = (that) => {
+    _resume = (ticker) => {
+        _notify(ticker, true);
     },
 
-
-
-    _attach = (that, callback) => {
-        that.callback = callback;
-        _notify(that);
+    _attach = (ticker, callback) => {
+        ticker.callback = callback;
+        _notify(ticker);
     };
 
 module.exports = {
 
-    allocate: function (sequence) {
-        let that = _allocate(sequence);
+    allocate: function () {
+        let ticker = _allocate();
         return {
 
             tick: () => {
-                return _tick(that);
+                return _tick(ticker);
             },
 
             pause: () => {
-                return _pause(that);
+                return _pause(ticker);
             },
 
             resume: () => {
-                return _resume(that);
+                return _resume(ticker);
             },
 
             on: (callback) => {
-                return _attach(that, callback);
+                return _attach(ticker, callback);
             }
 
         };
