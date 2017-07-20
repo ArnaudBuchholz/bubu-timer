@@ -14,8 +14,8 @@ global.it = (label, callback) => {
         QUnit.test(label, assert => {
             if (callback.length) {
                 var done = assert.async();
-                callback(() => {
-                    assert.ok(true);
+                callback((e) => {
+                    assert.ok(undefined === e);
                     done();
                 });
             } else {
