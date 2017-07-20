@@ -7,7 +7,8 @@ qUnit.setup({
         tests: true,
         globalSummary: true,
         testing: true
-    }
+    },
+    maxBlockDuration: 2000
 });
 
 // one code and tests file
