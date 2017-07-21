@@ -1,6 +1,31 @@
 "use strict";
 
-const tickGenerator = require("../src/tick-generator");
+const
+    tickGenerator = require("../src/tick-generator"),
+
+    TICK = (ticker) => ticker.tick(),
+    PAUSE = (ticker) => ticker.pause(),
+    RESUME = (ticker) => ticker.resume(),
+
+    execute = (ticker, sequence, delay = 100) => {
+        return new Promise((resolve) => {
+            const next = () => {
+                let command = sequence.shift();
+                setTimeout(function () {
+                    command.call(null, ticker);
+                    if (sequence.length) {
+                        next();
+                    } else {
+                        resolve();
+                    }
+                }, delay);
+            };
+            next();
+
+        });
+    }
+;
+
 
 describe("tick-generator", function () {
 
@@ -29,7 +54,7 @@ describe("tick-generator", function () {
         let ticker = tickGenerator.allocate();
         ticker.on((tick) => {
             try {
-                assert(tick.paused === true);
+                assert(tick.paused);
                 done();
             } catch (e) {
                 done(e);
@@ -38,80 +63,62 @@ describe("tick-generator", function () {
     });
 
     it("starts paused", (done) => {
-        let ticker = tickGenerator.allocate(),
-            ticked = 0;
+        let ticker = tickGenerator.allocate();
         ticker.on((tick) => {
             try {
-                assert(tick.paused === true);
-                assert(tick.elapsed === 0);
-                if (3 === ++ticked) {
-                    done();
-                }
+                assert(tick.paused);
+                assert(0 === tick.elapsed);
             } catch (e) {
                 done(e);
             }
         });
-        setTimeout(function () {
-            ticker.tick();
-            setTimeout(function () {
-                ticker.tick();
-            }, 100);
-        }, 100);
+        execute(ticker, [TICK, TICK]).then(done);
     });
 
     it("measures elapsed time", (done) => {
         let ticker = tickGenerator.allocate(),
-            ticked = 0;
+            ticked = -1; // 0 is initial tick when attaching callback
         ticker.on((tick) => {
             try {
-                if (3 === ++ticked) {
+                ++ticked;
+                if (1 === ticked) {
+                    assert(0 === tick.elapsed);
+                } else if (2 === ticked) {
                     assert(100 <= tick.elapsed);
-                    done();
                 }
             } catch (e) {
-                console.log(e);
                 done(e);
             }
         });
-        ticker.resume();
-        setTimeout(function () {
-            ticker.tick();
-        }, 100);
+        execute(ticker, [RESUME, TICK]).then(done);
     });
 
     it("stops measuring time on pause", (done) => {
         let ticker = tickGenerator.allocate(),
-            ticked = 0;
+            ticked = -1,  // 0 is initial tick when attaching callback
+            lastElapsed;
         ticker.on((tick) => {
             try {
+                ++ticked;
                 if (2 < ticked) {
-                    assert(100 <= tick.elapsed);
-                    assert(200 >= tick.elapsed);
+                    lastElapsed = tick.elapsed;
+                    assert(200 <= lastElapsed);
+                    assert(300 >= lastElapsed);
                 }
-                if (2 === ticked) {
-                    assert(tick.paused === false);
-                }
-                if (3 === ticked) {
-                    assert(tick.paused === true);
-                }
-                if (5 === ++ticked) {
-                    done();
+                if (0 === ticked) {
+                    assert(tick.paused);
+                } else if (1 === ticked || 2 === ticked) {
+                    assert(!tick.paused);
+                } else {
+                    assert(lastElapsed === tick.elapsed);
+                    assert(tick.paused);
                 }
             } catch (e) {
                 console.log(e);
                 done(e);
             }
         });
-        ticker.resume();
-        setTimeout(function () {
-            ticker.pause();
-            setTimeout(function () {
-                ticker.tick();
-                setTimeout(function () {
-                    ticker.tick();
-                }, 100);
-            }, 100);
-        }, 100);
+        execute(ticker, [RESUME, TICK, PAUSE, TICK]).then(done);
     });
 
 });
