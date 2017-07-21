@@ -25,17 +25,11 @@ const
         });
     },
 
-    _tick = (ticker) => {
-        _notify(ticker);
-    },
+    _tick = ticker => _notify(ticker),
 
-    _pause = (ticker) => {
-        _notify(ticker, false);
-    },
+    _pause = ticker => _notify(ticker, false),
 
-    _resume = (ticker) => {
-        _notify(ticker, true);
-    },
+    _resume = ticker => _notify(ticker, true),
 
     _attach = (ticker, callback) => {
         ticker.callback = callback;
@@ -47,23 +41,10 @@ module.exports = {
     allocate: function () {
         let ticker = _allocate();
         return {
-
-            tick: () => {
-                return _tick(ticker);
-            },
-
-            pause: () => {
-                return _pause(ticker);
-            },
-
-            resume: () => {
-                return _resume(ticker);
-            },
-
-            on: (callback) => {
-                return _attach(ticker, callback);
-            }
-
+            tick: () => _tick(ticker),
+            pause: () => _pause(ticker),
+            resume: () => _resume(ticker),
+            on: callback => _attach(ticker, callback)
         };
     }
 
