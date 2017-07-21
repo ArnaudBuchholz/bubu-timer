@@ -1,5 +1,7 @@
 "use strict";
 
+const fs = require("fs");
+
 let qUnit = require("qunit");
 qUnit.setup({
     log: {
@@ -11,12 +13,15 @@ qUnit.setup({
     maxBlockDuration: 2000
 });
 
-// one code and tests file
-qUnit.run({
-    code: "test/adapter/qunit.js",
-    tests: "test/tick-generator.js"
-}, err => {
-    if (err) {
-        console.log(err);
-    }
-});
+qUnit.run(fs.readdirSync("test")
+    .filter(name => -1 === ["adapter", "qunit.js"].indexOf(name))
+    .map(name => {
+        return {
+            code: "test/adapter/qunit.js",
+            tests: "test/" + name
+        };
+    }), err => {
+        if (err) {
+            console.log(err);
+        }
+    });
