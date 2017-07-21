@@ -16,13 +16,13 @@ const
             ticker.elapsed += now - ticker.lastTick;
         }
         ticker.lastTick = now;
+        if (undefined !== active) {
+            ticker.active = active;
+        }
         ticker.callback({
             paused: !ticker.active,
             elapsed: ticker.elapsed
         });
-        if (undefined !== active) {
-            ticker.active = active;
-        }
     },
 
     _tick = (ticker) => {
