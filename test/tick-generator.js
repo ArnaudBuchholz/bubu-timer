@@ -26,7 +26,6 @@ const
     }
 ;
 
-
 describe("tick-generator", function () {
 
     it("exists", () => {
