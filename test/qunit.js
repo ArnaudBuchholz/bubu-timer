@@ -13,15 +13,14 @@ qUnit.setup({
     maxBlockDuration: 2000
 });
 
-qUnit.run(fs.readdirSync("test")
-    .filter(name => -1 === ["adapter", "qunit.js"].indexOf(name))
-    .map(name => {
-        return {
-            code: "test/adapter/qunit.js",
-            tests: "test/" + name
-        };
-    }), err => {
-        if (err) {
-            console.log(err);
-        }
-    });
+qUnit.run({
+    code: "test/adapter/qunit.js",
+    tests: fs.readdirSync("test")
+        .filter(name => -1 === ["adapter", "qunit.js"].indexOf(name))
+        .map(name => "test/" + name)
+}, err => {
+    if (err) {
+        console.log(err);
+    }
+});
+
