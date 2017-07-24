@@ -3,25 +3,32 @@
 const
     _allocate = () => {
         return {
-            active: false,
             elapsed: 0,
-            lastTick: new Date(),
+            refTick: null,
             callback: () => {}
         }
     },
 
+    _update = (ticker, active) => {
+        let now = new Date(),
+            elapsed = ticker.elapsed;
+        if (ticker.refTick) {
+            elapsed += now - ticker.refTick;
+            if (false === active) {
+                ticker.elapsed = elapsed;
+                ticker.refTick = null;
+            }
+        } else if (active) {
+            ticker.refTick = now;
+        }
+        return elapsed;
+    },
+
     _notify = (ticker, active) => {
-        let now = new Date();
-        if (ticker.active) {
-            ticker.elapsed += now - ticker.lastTick;
-        }
-        ticker.lastTick = now;
-        if (undefined !== active) {
-            ticker.active = active;
-        }
+        let elapsed = _update(ticker, active);
         ticker.callback({
-            paused: !ticker.active,
-            elapsed: ticker.elapsed
+            paused: !ticker.refTick,
+            elapsed: elapsed
         });
     },
 
