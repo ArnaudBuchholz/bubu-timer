@@ -26,6 +26,24 @@ describe("tick-converter", function () {
         sequence: [1000],
         expectedStep: 1,
         expectedRemaining: 0
+    }, {
+        label: "Elapsed in second step",
+        tick: 1123,
+        sequence: [1000, 1000],
+        expectedStep: 1,
+        expectedRemaining: 877
+    }, {
+        label: "Second step fully elapsed",
+        tick: 2000,
+        sequence: [1000, 1000, 1000],
+        expectedStep: 2,
+        expectedRemaining: 1000
+    }, {
+        label: "Over last step",
+        tick: 3050,
+        sequence: [1000, 1000, 1000],
+        expectedStep: 3,
+        expectedRemaining: 0
 
     }].forEach(test => {
 
@@ -33,6 +51,7 @@ describe("tick-converter", function () {
 
         it(`gives remaining time from sequence: ${label}`, () => {
             let {step, remaining} = tickConverter(tick, sequence);
+            // console.log(`${label} step ${step} =? ${expectedStep} remaining ${remaining} =? ${expectedRemaining}`);
             assert(step === expectedStep);
             assert(remaining === expectedRemaining);
         });
