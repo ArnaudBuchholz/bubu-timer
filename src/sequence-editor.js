@@ -33,4 +33,4 @@ module.exports = {
 
     sub: ms => _update(-ms)
 
-}
+};
