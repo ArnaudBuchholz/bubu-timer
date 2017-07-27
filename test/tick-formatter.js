@@ -13,7 +13,6 @@ const
         result.push(x);
         return result.join("");
     }
-
 ;
 
 describe("tick-formatter", function () {
@@ -50,14 +49,7 @@ describe("tick-formatter", function () {
         m: 2,
         digits: [0, 2, 3, 4, 3, 4, 8]
 
-    }].forEach(test => {
-        let {
-            tick,
-            ms,
-            s,
-            m,
-            digits
-        } = test;
+    }].forEach(({tick, ms, s, m, digits }) => {
         it(`format tick into time details: ${tick} = ${zero(m)}:${zero(s)}.${zero(ms,4)}`, () => {
             let formatted = tickFormatter(tick);
             assert(ms === formatted.ms);
