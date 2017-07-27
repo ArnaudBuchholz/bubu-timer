@@ -45,9 +45,7 @@ describe("tick-converter", function () {
         expectedStep: 3,
         expectedRemaining: 0
 
-    }].forEach(test => {
-
-        let {label, tick, sequence, expectedStep, expectedRemaining} = test;
+    }].forEach(({label, tick, sequence, expectedStep, expectedRemaining}) => {
 
         it(`gives remaining time from sequence: ${label}`, () => {
             let {step, remaining} = tickConverter(tick, sequence);
