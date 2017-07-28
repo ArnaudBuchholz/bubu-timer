@@ -19,6 +19,7 @@
   "homepage": "https://github.com/ArnaudBuchholz/bubu-timer#readme",
   "devDependencies": {
     "qunit": "^1.0.0",
-    "webpack": "^3.3.0"
+    "webpack": "^3.3.0",
+    "gpf-js": "^0.2.1"
   }
 }
