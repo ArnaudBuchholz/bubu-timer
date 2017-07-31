@@ -9,7 +9,7 @@ const
 module.exports = {
 
     entry: {
-        index: [
+        run: [
             "./src/run.js",
         ],
     },
@@ -22,31 +22,40 @@ module.exports = {
 
     resolve: {
         extensions: [
-            "",
             ".js",
             ".json",
         ],
     },
 
     module: {
-        loaders: [{
+        rules: [{
             test: /\.js$/,
             exclude: /node_modules/,
-            loaders: ["babel", "eslint"]
+            use: [{
+                loader: "babel-loader",
+                options: {
+                    presets: ['env']
+                }
+            }, {
+                loader: "eslint-loader"
+            }]
         }],
     },
 
-    plugins: [],
-        // .concat(
-        //     release
-        //         ? [
-        //             new webpack.optimize.UglifyJsPlugin({
-        //                 compress: {
-        //                     warnings: false,
-        //                 },
-        //             }),
-        //         ]
-        //         : []
-        // )
+    plugins: []
+        .concat(
+            release
+                ? [
+                    new webpack.optimize.UglifyJsPlugin({
+                        compress: {
+                            warnings: false,
+                        },
+                    }),
+                ]
+                : []
+        ),
 
+    node: {
+        fs: 'empty'
+    }
 };
