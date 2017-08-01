@@ -6,14 +6,66 @@
     <meta name="viewport" content="initial-scale=1.0" />
     <!--<script language="JavaScript" src="dist/run.js"></script>-->
     <!--https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths-->
+    <script>
+
+// Support de compatibilité avec requestAnimFrame
+window.requestAnimFrame = (function(){
+    return window.requestAnimationFrame || // La forme standardisée
+        window.webkitRequestAnimationFrame || // Pour Chrome et Safari
+        window.mozRequestAnimationFrame || // Pour Firefox
+        window.oRequestAnimationFrame || // Pour Opera
+        window.msRequestAnimationFrame || // Pour Internet Explorer
+
+        // Pour les élèves du dernier rang
+        function(callback){
+            window.setTimeout(callback, 1000 / 60);
+        };
+})();
+
+let tick = 0;
+
+function animate () {
+    let deg = (360 * tick / 200) % 360,
+        rad = deg * 2 * Math.PI / 360,
+        toX1 = Math.floor(9900 * Math.sin(rad)) / 10000,
+        toY1 = Math.floor(-9900 * Math.cos(rad)) / 10000,
+        toX2 = Math.floor(8900 * Math.sin(rad)) / 10000,
+        toY2 = Math.floor(-8900 * Math.cos(rad)) / 10000,
+        secondHalf = deg > 180,
+        path = [
+            "M 0 -.99"
+        ];
+    if (deg > 180) {
+        path.push(`A .99 .99 0 0 1 0 .99`,
+            `A .99 .99 0 0 1 ${toX1} ${toY1}`,
+            `L ${toX2} ${toY2}`,
+            "A .89 .89 0 0 0 0 .89",
+            "A .89 .89 0 0 0 0 -.89",
+        );
+    } else {
+        path.push(`A .99 .99 0 0 1 ${toX1} ${toY1}`,
+            `L ${toX2} ${toY2}`,
+            "A .89 .89 0 0 0 0 -.89"
+        );
+    }
+    path.push("L 0 -.99");
+    document.getElementById("p").setAttribute("d", path.join(" "));
+    ++tick;
+    requestAnimFrame(animate);
+}
+
+    </script>
 </head>
-<body style="width:100%;height:100%;margin:0;">
+<body style="width:100%;height:100%;margin:0;" onload="animate()">
     <svg width="100%" height="100%" viewBox="-1 -1 2 2">
-        <circle cx="0" cy="0" r=".99" stroke="black" stroke-width=".01" fill="blue" />
-        <circle cx="0" cy="0" r=".89" stroke="black" stroke-width=".01" fill="green" />
-        <circle cx="0" cy="0" r=".79" stroke="black" stroke-width=".01" fill="white" />
-        <text font-family="Arial" font-size=".3" x="0" y=".1" text-anchor="middle" fill="red" stroke="black" stroke-width=".01">00:00.1234</text>
+        <circle cx="0" cy="0" r=".99" stroke="white" stroke-width=".01" fill="blue" />
+        <circle cx="0" cy="0" r=".89" stroke="white" stroke-width=".01" fill="green" />
+        <circle cx="0" cy="0" r=".79" stroke="white" stroke-width=".01" fill="white" />
+        <text font-family="Arial" font-size=".3" x="0" y=".1" text-anchor="middle" fill="red" stroke="black" stroke-width=".01">00:00</text>
+        <text font-family="Arial" font-size=".1" x=".65" y=".1" text-anchor="end" fill="red" stroke="black" stroke-width=".001">.1234</text>
         <text font-family="Arial" font-size=".1" x="0" y=".3" text-anchor="middle" stroke="black" stroke-width=".01">1 / 2</text>
+        <path id="p" d="M 0 -.99 A .99 .99 0 0 1 .99 0 L .89 0 A .89 .89 0 0 0 0 -.89 L 0 -.99"
+              fill="purple" stroke="black" stroke-width=".01" />
     </svg>
 </body>
 </html>
