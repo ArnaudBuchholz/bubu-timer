@@ -4,25 +4,14 @@
     <title>.::BUBU-TIMER / RUNNER::.</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1.0" />
-    <script language="JavaScript" src="dist/run.js"></script>
-    <script language="JavaScript">
-
-// TODO https://hackernoon.com/a-simple-pie-chart-in-svg-dbdd653b6936
-
-function onResize () {
-    var width = document.body.clientWidth,
-        height = document.body.clientHeight,
-        radius = Math.min(width, height) / 2;
-    var c1 = document.getElementById("c1");
-    c1.setAttribute("cx", (width / 2) + "px");
-    c1.setAttribute("cy", (height / 2) + "px");
-    c1.setAttribute("r", radius + "px");
-}
-    </script>
+    <!--<script language="JavaScript" src="dist/run.js"></script>-->
 </head>
-<body style="width:100%;height:100%;margin:0;" onresize="onResize()" onload="onResize()">
-    <svg width="100%" height="100%">
-        <circle id="c1" cx="50%" cy="50%" r="50%" stroke="black" stroke-width="1" fill="blue" />
+<body style="width:100%;height:100%;margin:0;">
+    <svg width="100%" height="100%" viewBox="-1 -1 2 2">
+        <circle cx="0" cy="0" r=".99" stroke="black" stroke-width=".01" fill="blue" />
+        <circle cx="0" cy="0" r=".89" stroke="black" stroke-width=".01" fill="green" />
+        <circle cx="0" cy="0" r=".79" stroke="black" stroke-width=".01" fill="white" />
+        <text font-family="Arial" font-size=".3" x="0" y=".1" text-anchor="middle" stroke="black" stroke-width=".01">00:00.1234</text>
     </svg>
 </body>
 </html>
