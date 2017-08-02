@@ -6,7 +6,7 @@ const
             elapsed: 0,
             refTick: null,
             callback: () => {}
-        }
+        };
     },
 
     _update = (ticker, active) => {
