@@ -8,13 +8,12 @@ module.exports = (elapsed, sequence) => {
             elapsed -= ms;
             ++step;
             return true;
-        } else {
-            remaining = ms - elapsed;
-            if (remaining === 0) {
-                ++step;
-            }
-            return false;
         }
+        remaining = ms - elapsed;
+        if (remaining === 0) {
+            ++step;
+        }
+        return false;
     });
     return {step, remaining};
 };
