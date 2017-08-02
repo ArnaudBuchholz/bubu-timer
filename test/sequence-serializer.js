@@ -4,6 +4,9 @@ const
     sequenceSerializer = require("../src/sequence-serializer"),
 
     tests = [{
+        string: "",
+        sequence: []
+    }, {
         string: "1",
         sequence: [1000]
     }, {
@@ -21,7 +24,7 @@ describe("sequence-serializer", () => {
     describe("write", () => {
 
         tests.forEach(({string, sequence}) => {
-            it(`${JSON.stringify(sequence)} => ${string}`, function () {
+            it(`${JSON.stringify(sequence)} => "${string}"`, function () {
                 assert(string === sequenceSerializer.write(sequence));
             });
         });
@@ -31,7 +34,7 @@ describe("sequence-serializer", () => {
     describe("read", () => {
 
         tests.forEach(({string, sequence}) => {
-            it(`${string} => ${JSON.stringify(sequence)}`, function () {
+            it(`"${string}" => ${JSON.stringify(sequence)}`, function () {
                 let result = sequenceSerializer.read(string);
                 assert(result.length === sequence.length);
                 sequence.forEach((count, index) => assert(count === result[index]));
