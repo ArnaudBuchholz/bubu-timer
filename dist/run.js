@@ -92,25 +92,40 @@ var sequenceSerializer = __webpack_require__(2),
 || window.msRequestAnimationFrame // Internet Explorer
 || defaultRequestAnimFrame,
     sequence = sequenceSerializer.read(location.search.substr(1)),
+    sequenceTotal = sequence.reduce(function (total, tick) {
+    return total + tick;
+}, 0),
     ticker = tickGenerator.allocate(),
+    ratio2Coords = function ratio2Coords(ratio) {
+    var radius = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+    var precision = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 10000;
+
+    var radian = ratio * 2 * Math.PI,
+        x = Math.floor(radius * precision * Math.sin(radian)) / precision,
+        y = Math.floor(-radius * precision * Math.cos(radian)) / precision;
+    return { x: x, y: y };
+},
+    getCirclePath = function getCirclePath(ratio, outerRadius, innerRadius) {
+    var outer = ratio2Coords(ratio, outerRadius),
+        inner = ratio2Coords(ratio, innerRadius),
+        path = ["M 0 -" + outerRadius];
+    if (ratio > 0.5) {
+        path.push("A " + outerRadius + " " + outerRadius + " 0 0 1 0 " + outerRadius, "A " + outerRadius + " " + outerRadius + " 0 0 1 " + outer.x + " " + outer.y, "L " + inner.x + " " + inner.y, "A " + innerRadius + " " + innerRadius + " 0 0 0 0 " + innerRadius, "A " + innerRadius + " " + innerRadius + " 0 0 0 0 -" + innerRadius);
+    } else {
+        path.push("A " + outerRadius + " " + outerRadius + " 0 0 1 " + outer.x + " " + outer.y, "L " + inner.x + " " + inner.y, "A " + innerRadius + " " + innerRadius + " 0 0 0 0 -" + innerRadius);
+    }
+    path.push("L 0 -" + outerRadius);
+    return path.join(" ");
+},
     onTick = function onTick(tick) {
 
-    var deg = 360 * tick.elapsed / 200 % 360,
-        rad = deg * 2 * Math.PI / 360,
-        toX1 = Math.floor(9900 * Math.sin(rad)) / 10000,
-        toY1 = Math.floor(-9900 * Math.cos(rad)) / 10000,
-        toX2 = Math.floor(8900 * Math.sin(rad)) / 10000,
-        toY2 = Math.floor(-8900 * Math.cos(rad)) / 10000,
-        secondHalf = deg > 180,
-        path = ["M 0 -.99"];
-    if (deg > 180) {
-        path.push("A .99 .99 0 0 1 0 .99", "A .99 .99 0 0 1 " + toX1 + " " + toY1, "L " + toX2 + " " + toY2, "A .89 .89 0 0 0 0 .89", "A .89 .89 0 0 0 0 -.89");
-    } else {
-        path.push("A .99 .99 0 0 1 " + toX1 + " " + toY1, "L " + toX2 + " " + toY2, "A .89 .89 0 0 0 0 -.89");
-    }
-    path.push("L 0 -.99");
-    document.getElementById("p").setAttribute("d", path.join(" "));
-    ++tick;
+    var convertedTick = tickConverter(tick.elapsed, sequence),
+        currentDuration = sequence[convertedTick.step % sequence.length],
+        outer = tick.elapsed / sequenceTotal % 1,
+        inner = 1 - convertedTick.remaining / currentDuration;
+
+    document.getElementById("outer").setAttribute("d", getCirclePath(outer, 0.99, 0.89));
+    document.getElementById("inner").setAttribute("d", getCirclePath(inner, 0.89, 0.79));
 
     requestAnimFrame(ticker.tick.bind(ticker));
 },
@@ -136,11 +151,17 @@ var sequenceSerializer = __webpack_require__(2),
         width: "100%",
         height: "100%",
         viewBox: "-1 -1 2 2"
-    }, [circle({ cx: 0, cy: 0, r: 0.99, stroke: "white", "stroke-width": 0.01, fill: "blue" }), circle({ cx: 0, cy: 0, r: 0.89, stroke: "white", "stroke-width": 0.01, fill: "green" }), circle({ cx: 0, cy: 0, r: 0.79, stroke: "white", "stroke-width": 0.01, fill: "white" }), text({ "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
-        fill: "red", stroke: "black", "stroke-width": 0.01 }, "00:00"), text({ "font-family": "Arial", "font-size": 0.1, x: 0.65, y: 0.1, "text-anchor": "end",
-        fill: "red", stroke: "black", "stroke-width": 0.001 }, ".123"), text({ "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
-        fill: "red", stroke: "black", "stroke-width": 0.01 }, "1 / 2"), path({ id: "p", d: "M 0 -.99 A .99 .99 0 0 1 .99 0 L .89 0 A .89 .89 0 0 0 0 -.89 L 0 -.99",
-        fill: "purple", stroke: "black", "stroke-width": 0.01 })]));
+    }, [circle({ cx: 0, cy: 0, r: 0.99, stroke: "white", "stroke-width": 0.01, fill: "blue" }), circle({ cx: 0, cy: 0, r: 0.89, stroke: "white", "stroke-width": 0.01, fill: "green" }), circle({ cx: 0, cy: 0, r: 0.79, stroke: "white", "stroke-width": 0.01, fill: "white" }), text({ id: "time",
+        "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
+        fill: "red", stroke: "black", "stroke-width": 0.01 }, "00:00"), text({ id: "ms",
+        "font-family": "Arial", "font-size": 0.1, x: 0.65, y: 0.1, "text-anchor": "end",
+        fill: "red", stroke: "black", "stroke-width": 0.001 }, ".123"), text({ id: "step",
+        "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
+        fill: "red", stroke: "black", "stroke-width": 0.01 }, "1 / 2"), path({ id: "outer",
+        d: "M 0 -.99 A .99 .99 0 0 1 .99 0 L .89 0 A .89 .89 0 0 0 0 -.89 L 0 -.99",
+        fill: "purple", stroke: "black", "stroke-width": 0.01 }), path({ id: "inner",
+        d: "M 0 -.89 A .89 .89 0 0 1 .89 0 L .79 0 A .79 .79 0 0 0 0 -.79 L 0 -.89",
+        fill: "red", stroke: "black", "stroke-width": 0.01 })]));
 };
 
 window.addEventListener("load", function () {
@@ -148,6 +169,8 @@ window.addEventListener("load", function () {
         alert("No sequence to play");
     } else {
         setup();
+        ticker.on(onTick);
+        ticker.resume();
     }
 });
 
@@ -255,7 +278,7 @@ module.exports = {
 module.exports = function (elapsed, sequence) {
     var step = 0,
         remaining = 0;
-    sequence.forEach(function (ms) {
+    sequence.every(function (ms) {
         if (elapsed >= ms) {
             elapsed -= ms;
             ++step;
