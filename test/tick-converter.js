@@ -44,12 +44,18 @@ describe("tick-converter", function () {
         sequence: [1000, 1000, 1000],
         expectedStep: 3,
         expectedRemaining: 0
+    }, {
+        label: "BUG 1 remaining not based on the right sequence",
+        tick: 0,
+        sequence: [15000, 10000],
+        expectedStep: 0,
+        expectedRemaining: 15000
 
     }].forEach(({label, tick, sequence, expectedStep, expectedRemaining}) => {
 
         it(`gives remaining time from sequence: ${label}`, () => {
             let {step, remaining} = tickConverter(tick, sequence);
-            // console.log(`${label} step ${step} =? ${expectedStep} remaining ${remaining} =? ${expectedRemaining}`);
+            console.log(`${label} step ${step} =? ${expectedStep} remaining ${remaining} =? ${expectedRemaining}`);
             assert(step === expectedStep);
             assert(remaining === expectedRemaining);
         });
