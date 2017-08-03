@@ -3,7 +3,7 @@
 module.exports = (elapsed, sequence) => {
     let step = 0,
         remaining = 0;
-    sequence.forEach((ms) => {
+    sequence.every((ms) => {
         if (elapsed >= ms) {
             elapsed -= ms;
             ++step;
