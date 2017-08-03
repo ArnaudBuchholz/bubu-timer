@@ -3,7 +3,6 @@
 /*eslint-disable no-alert, no-undef, no-unused-vars*/
 
 const
-    gpf = require("gpf-js"),
     sequenceSerializer = require("./sequence-serializer"),
     tickGenerator = require("./tick-generator"),
     tickConverter = require("./tick-converter"),
@@ -54,13 +53,25 @@ const
         requestAnimFrame(ticker.tick.bind(ticker));
     },
 
-    svg = gpf.web.createTagFunction("svg"),
-    circle = gpf.web.createTagFunction("circle"),
-    text = gpf.web.createTagFunction("text"),
-    path = gpf.web.createTagFunction("path"),
+    genSvgTag = function (tagName, properties, children) {
+        let element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
+        Object.keys(properties).forEach(name => {
+            element.setAttribute(name, properties[name]);
+        });
+        [].concat(children || [])
+            .map(def => typeof def === "string" ? document.createTextNode(def) : def)
+            .forEach(node => element.appendChild(node));
+        return element;
+    },
 
     setup = () => {
-        svg({
+        const
+            svg = genSvgTag.bind(null, "svg"),
+            circle = genSvgTag.bind(null, "circle"),
+            text = genSvgTag.bind(null, "text"),
+            path = genSvgTag.bind(null, "path");
+
+        document.body.appendChild(svg({
             width: "100%",
             height: "100%",
             viewBox: "-1 -1 2 2"
@@ -77,7 +88,7 @@ const
             path({id: "p", d: "M 0 -.99 A .99 .99 0 0 1 .99 0 L .89 0 A .89 .89 0 0 0 0 -.89 L 0 -.99",
                 fill: "purple", stroke: "black", "stroke-width": 0.01})
 
-        ]).appendTo(document.body);
+        ]));
     }
 ;
 
@@ -85,6 +96,6 @@ window.addEventListener("load", () => {
     if (0 === sequence.length) {
         alert("No sequence to play");
     } else {
-        // setup();
+        setup();
     }
 });
