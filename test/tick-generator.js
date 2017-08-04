@@ -37,9 +37,9 @@ describe("tick-generator", function () {
         assert(ticker);
     });
 
-    it("exposes tick, pause and resume methods", () => {
-        let ticker = tickGenerator.allocate();
-        ["tick", "pause", "resume"].forEach(methodName => {
+    ["tick", "pause", "resume", "on", "isPaused"].forEach(methodName => {
+        it(`exposes ${methodName} method`, () => {
+            let ticker = tickGenerator.allocate();
             assert("function" === typeof ticker[methodName]);
         });
     });
@@ -54,6 +54,7 @@ describe("tick-generator", function () {
         ticker.on((tick) => {
             try {
                 assert(tick.paused);
+                assert(ticker.isPaused());
                 done();
             } catch (e) {
                 done(e);
@@ -66,6 +67,7 @@ describe("tick-generator", function () {
         ticker.on((tick) => {
             try {
                 assert(tick.paused);
+                assert(ticker.isPaused());
                 assert(0 === tick.elapsed);
             } catch (e) {
                 done(e);
@@ -83,6 +85,7 @@ describe("tick-generator", function () {
                 if (1 === ticked) {
                     assert(0 === tick.elapsed);
                 } else if (2 === ticked) {
+                    assert(!ticker.isPaused());
                     assert(100 <= tick.elapsed);
                 }
             } catch (e) {
@@ -106,11 +109,14 @@ describe("tick-generator", function () {
                 }
                 if (0 === ticked) {
                     assert(tick.paused);
+                    assert(ticker.isPaused());
                 } else if (1 === ticked || 2 === ticked) {
                     assert(!tick.paused);
+                    assert(!ticker.isPaused());
                 } else {
                     assert(lastElapsed === tick.elapsed);
                     assert(tick.paused);
+                    assert(ticker.isPaused());
                 }
             } catch (e) {
                 console.log(e);
