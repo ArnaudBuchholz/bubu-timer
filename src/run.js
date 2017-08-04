@@ -3,6 +3,11 @@
 /*eslint-disable no-alert, no-undef, no-unused-vars*/
 
 const
+    TOTAL_OUTER = 0.98,
+    TOTAL_INNER = 0.88,
+    STEP_OUTER  = 0.83,
+    STEP_INNER  = 0.73,
+    colors = require("./colors"),
     sequenceSerializer = require("./sequence-serializer"),
     tickGenerator = require("./tick-generator"),
     tickConverter = require("./tick-converter"),
@@ -58,12 +63,12 @@ const
         let
             convertedTick = tickConverter(tick.elapsed, sequence),
             currentDuration = sequence[convertedTick.step % sequence.length],
-            outer = tick.elapsed / sequenceTotal % 1,
-            inner = 1 - convertedTick.remaining / currentDuration,
+            total = tick.elapsed / sequenceTotal % 1,
+            step = 1 - convertedTick.remaining / currentDuration,
             formattedRemaining = tickFormatter(convertedTick.remaining);
 
-        document.getElementById("outer").setAttribute("d", getCirclePath(outer, 0.99, 0.89));
-        document.getElementById("inner").setAttribute("d", getCirclePath(inner, 0.89, 0.79));
+        document.getElementById("total").setAttribute("d", getCirclePath(total, TOTAL_OUTER, TOTAL_INNER));
+        document.getElementById("step").setAttribute("d", getCirclePath(step, STEP_OUTER, STEP_INNER));
         document.getElementById("time").innerHTML = formattedRemaining.time;
         document.getElementById("ms").innerHTML = `.${formattedRemaining.ms}`;
 
@@ -86,38 +91,79 @@ const
         return element;
     },
 
+    svg = genSvgTag.bind(null, "svg"),
+    circle = genSvgTag.bind(null, "circle"),
+    text = genSvgTag.bind(null, "text"),
+    path = genSvgTag.bind(null, "path"),
+
+    progressContainer = ({outerRadius, innerRadius, id, color}) => {
+        let po1 = ratio2Coords(0.085, outerRadius),
+            po2 = ratio2Coords(0.165, outerRadius),
+            po3 = ratio2Coords(0.585, outerRadius),
+            po4 = ratio2Coords(0.665, outerRadius),
+            pi1 = ratio2Coords(0.085, innerRadius),
+            pi2 = ratio2Coords(0.165, innerRadius),
+            pi3 = ratio2Coords(0.585, innerRadius),
+            pi4 = ratio2Coords(0.665, innerRadius)
+        ;
+        return [
+            circle({cx: 0, cy: 0, r: outerRadius, stroke: colors.circle.light, "stroke-width": 0.01,
+                fill: colors.circle.background}),
+            circle({cx: 0, cy: 0, r: innerRadius, stroke: colors.circle.light, "stroke-width": 0.01,
+                fill: colors.background}),
+            path({d: `M ${po1.x} ${po1.y} A ${outerRadius} ${outerRadius} 0 0 1 ${po2.x} ${po2.y}`,
+                fill: "transparent", stroke: colors.circle.shaded, "stroke-width": 0.01}),
+            path({d: `M ${po2.x} ${po2.y} A ${outerRadius} ${outerRadius} 0 0 1 ${po3.x} ${po3.y}`,
+                fill: "transparent", stroke: colors.circle.dark, "stroke-width": 0.01}),
+            path({d: `M ${po3.x} ${po3.y} A ${outerRadius} ${outerRadius} 0 0 1 ${po4.x} ${po4.y}`,
+                fill: "transparent", stroke: colors.circle.shaded, "stroke-width": 0.01}),
+            path({d: `M ${pi1.x} ${pi1.y} A ${innerRadius} ${innerRadius} 0 0 1 ${pi2.x} ${pi2.y}`,
+                fill: "transparent", stroke: colors.circle.shaded, "stroke-width": 0.01}),
+            path({d: `M ${pi2.x} ${pi2.y} A ${innerRadius} ${innerRadius} 0 0 1 ${pi3.x} ${pi3.y}`,
+                fill: "transparent", stroke: colors.circle.dark, "stroke-width": 0.01}),
+            path({d: `M ${pi3.x} ${pi3.y} A ${innerRadius} ${innerRadius} 0 0 1 ${pi4.x} ${pi4.y}`,
+                fill: "transparent", stroke: colors.circle.shaded, "stroke-width": 0.01}),
+            path({id: id,
+                d: `M 0 -${outerRadius} A ${outerRadius} ${outerRadius} 0 0 1 ${outerRadius} 0
+                L ${innerRadius} 0 A ${innerRadius} ${innerRadius} 0 0 0 0 -${innerRadius} L 0 -${outerRadius}`,
+                fill: color, stroke: color, "stroke-opacity": 0.2, "stroke-width": 0.01})
+        ];
+    },
+
     setup = () => {
-        const
-            svg = genSvgTag.bind(null, "svg"),
-            circle = genSvgTag.bind(null, "circle"),
-            text = genSvgTag.bind(null, "text"),
-            path = genSvgTag.bind(null, "path");
 
         document.body.appendChild(svg({
             width: "100%",
             height: "100%",
-            viewBox: "-1 -1 2 2"
-        }, [
-            circle({cx: 0, cy: 0, r: 0.99, stroke: "white", "stroke-width": 0.01, fill: "blue"}),
-            circle({cx: 0, cy: 0, r: 0.89, stroke: "white", "stroke-width": 0.01, fill: "green"}),
-            circle({cx: 0, cy: 0, r: 0.79, stroke: "white", "stroke-width": 0.01, fill: "white"}),
-            text({id: "time",
-                "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
-                fill: "red", stroke: "black", "stroke-width": 0.01}, "00:00"),
-            text({id: "ms",
-                "font-family": "Arial", "font-size": 0.1, x: 0.60, y: 0.1, "text-anchor": "end",
-                fill: "red", stroke: "black", "stroke-width": 0.001}, ".123"),
-            text({id: "step",
-                "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
-                fill: "red", stroke: "black", "stroke-width": 0.01}, "1 / 2"),
-            path({id: "outer",
-                d: "M 0 -.99 A .99 .99 0 0 1 .99 0 L .89 0 A .89 .89 0 0 0 0 -.89 L 0 -.99",
-                fill: "purple", stroke: "black", "stroke-width": 0.01}),
-            path({id: "inner",
-                d: "M 0 -.89 A .89 .89 0 0 1 .89 0 L .79 0 A .79 .79 0 0 0 0 -.79 L 0 -.89",
-                fill: "red", stroke: "black", "stroke-width": 0.01})
-
-        ]));
+            viewBox: "-1 -1 2 2",
+            style: `background-color: ${colors.background};`
+        }, progressContainer({
+            outerRadius: TOTAL_OUTER,
+            innerRadius: TOTAL_INNER,
+            id: "total",
+            color: colors.progress.total
+        })
+            .concat(progressContainer({
+                outerRadius: STEP_OUTER,
+                innerRadius: STEP_INNER,
+                id: "step",
+                color: colors.progress.step
+            }))
+            .concat([
+                text({id: "time",
+                    "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
+                    fill: colors.text.time,
+                    stroke: colors.text.time, "stroke-opacity": 0.2, "stroke-width": 0.01}, "00:00"),
+                text({id: "ms",
+                    "font-family": "Arial", "font-size": 0.1, x: 0.60, y: 0.1, "text-anchor": "end",
+                    fill: colors.text.ms,
+                    stroke: colors.text.ms, "stroke-opacity": 0.2, "stroke-width": 0.001}, ".123"),
+                text({id: "step",
+                    "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
+                    fill: colors.text.step,
+                    stroke: colors.text.step, "stroke-opacity": 0.2, "stroke-width": 0.01}, "1 / 2")
+            ])
+        ));
     }
 ;
 
