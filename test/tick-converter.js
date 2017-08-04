@@ -55,7 +55,7 @@ describe("tick-converter", function () {
 
         it(`gives remaining time from sequence: ${label}`, () => {
             let {step, remaining} = tickConverter(tick, sequence);
-            console.log(`${label} step ${step} =? ${expectedStep} remaining ${remaining} =? ${expectedRemaining}`);
+            // console.log(`${label} step ${step} =? ${expectedStep} remaining ${remaining} =? ${expectedRemaining}`);
             assert(step === expectedStep);
             assert(remaining === expectedRemaining);
         });
