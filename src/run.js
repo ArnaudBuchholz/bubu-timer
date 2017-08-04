@@ -59,12 +59,20 @@ const
             convertedTick = tickConverter(tick.elapsed, sequence),
             currentDuration = sequence[convertedTick.step % sequence.length],
             outer = tick.elapsed / sequenceTotal % 1,
-            inner = 1 - convertedTick.remaining / currentDuration;
+            inner = 1 - convertedTick.remaining / currentDuration,
+            formattedRemaining = tickFormatter(convertedTick.remaining);
 
         document.getElementById("outer").setAttribute("d", getCirclePath(outer, 0.99, 0.89));
         document.getElementById("inner").setAttribute("d", getCirclePath(inner, 0.89, 0.79));
+        document.getElementById("time").innerHTML = formattedRemaining.time;
+        document.getElementById("ms").innerHTML = `.${formattedRemaining.ms}`;
 
-        requestAnimFrame(ticker.tick.bind(ticker));
+        if (convertedTick.step < sequence.length) {
+            document.getElementById("step").innerHTML = `${convertedTick.step + 1} / ${sequence.length}`;
+            requestAnimFrame(ticker.tick.bind(ticker));
+        } else {
+            document.getElementById("step").innerHTML = "done.";
+        }
     },
 
     genSvgTag = function (tagName, properties, children) {
@@ -97,7 +105,7 @@ const
                 "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
                 fill: "red", stroke: "black", "stroke-width": 0.01}, "00:00"),
             text({id: "ms",
-                "font-family": "Arial", "font-size": 0.1, x: 0.65, y: 0.1, "text-anchor": "end",
+                "font-family": "Arial", "font-size": 0.1, x: 0.60, y: 0.1, "text-anchor": "end",
                 fill: "red", stroke: "black", "stroke-width": 0.001}, ".123"),
             text({id: "step",
                 "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
