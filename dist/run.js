@@ -122,12 +122,20 @@ var sequenceSerializer = __webpack_require__(2),
     var convertedTick = tickConverter(tick.elapsed, sequence),
         currentDuration = sequence[convertedTick.step % sequence.length],
         outer = tick.elapsed / sequenceTotal % 1,
-        inner = 1 - convertedTick.remaining / currentDuration;
+        inner = 1 - convertedTick.remaining / currentDuration,
+        formattedRemaining = tickFormatter(convertedTick.remaining);
 
     document.getElementById("outer").setAttribute("d", getCirclePath(outer, 0.99, 0.89));
     document.getElementById("inner").setAttribute("d", getCirclePath(inner, 0.89, 0.79));
+    document.getElementById("time").innerHTML = formattedRemaining.time;
+    document.getElementById("ms").innerHTML = "." + formattedRemaining.ms;
 
-    requestAnimFrame(ticker.tick.bind(ticker));
+    if (convertedTick.step < sequence.length) {
+        document.getElementById("step").innerHTML = convertedTick.step + 1 + " / " + sequence.length;
+        requestAnimFrame(ticker.tick.bind(ticker));
+    } else {
+        document.getElementById("step").innerHTML = "done.";
+    }
 },
     genSvgTag = function genSvgTag(tagName, properties, children) {
     var element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
@@ -154,7 +162,7 @@ var sequenceSerializer = __webpack_require__(2),
     }, [circle({ cx: 0, cy: 0, r: 0.99, stroke: "white", "stroke-width": 0.01, fill: "blue" }), circle({ cx: 0, cy: 0, r: 0.89, stroke: "white", "stroke-width": 0.01, fill: "green" }), circle({ cx: 0, cy: 0, r: 0.79, stroke: "white", "stroke-width": 0.01, fill: "white" }), text({ id: "time",
         "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
         fill: "red", stroke: "black", "stroke-width": 0.01 }, "00:00"), text({ id: "ms",
-        "font-family": "Arial", "font-size": 0.1, x: 0.65, y: 0.1, "text-anchor": "end",
+        "font-family": "Arial", "font-size": 0.1, x: 0.60, y: 0.1, "text-anchor": "end",
         fill: "red", stroke: "black", "stroke-width": 0.001 }, ".123"), text({ id: "step",
         "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
         fill: "red", stroke: "black", "stroke-width": 0.01 }, "1 / 2"), path({ id: "outer",
@@ -300,12 +308,26 @@ module.exports = function (elapsed, sequence) {
 "use strict";
 
 
+var _zero = function _zero(x) {
+    var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+
+    var result = [],
+        max = Math.pow(10, count - 1);
+    while (max > 1 && x < max) {
+        result.push("0");
+        max /= 10;
+    }
+    result.push(x);
+    return result.join("");
+};
+
 module.exports = function (tick) {
-    var ms = tick % 1000,
+    var ms = _zero(tick % 1000, 3),
         seconds = (tick - ms) / 1000,
-        s = seconds % 60,
-        m = (seconds - s) / 60;
-    return { ms: ms, s: s, m: m };
+        s = _zero(seconds % 60),
+        m = _zero((seconds - s) / 60),
+        time = m + ":" + s;
+    return { time: time, ms: ms };
 };
 
 /***/ })
