@@ -51,7 +51,8 @@ module.exports = {
             tick: () => _tick(ticker),
             pause: () => _pause(ticker),
             resume: () => _resume(ticker),
-            on: callback => _attach(ticker, callback)
+            on: callback => _attach(ticker, callback),
+            isPaused: () => !ticker.refTick
         };
     }
 
