@@ -127,6 +127,14 @@ window.addEventListener("load", () => {
     } else {
         setup();
         ticker.on(onTick);
-        ticker.resume();
     }
 });
+
+window.addEventListener("click", () => {
+    if (ticker.isPaused()) {
+        ticker.resume();
+    } else {
+        ticker.pause();
+    }
+});
+
