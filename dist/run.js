@@ -178,7 +178,14 @@ window.addEventListener("load", function () {
     } else {
         setup();
         ticker.on(onTick);
+    }
+});
+
+window.addEventListener("click", function () {
+    if (ticker.isPaused()) {
         ticker.resume();
+    } else {
+        ticker.pause();
     }
 });
 
@@ -270,6 +277,9 @@ module.exports = {
             },
             on: function on(callback) {
                 return _attach(ticker, callback);
+            },
+            isPaused: function isPaused() {
+                return !ticker.refTick;
             }
         };
     }
