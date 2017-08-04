@@ -1,19 +1,6 @@
 "use strict";
 
-const
-    tickFormatter = require("../src/tick-formatter"),
-
-    zero = (x, count = 2) => {
-        let result = [],
-            max = Math.pow(10, count - 1);
-        while (max > 1 && x < max) {
-            result.push("0");
-            max /= 10;
-        }
-        result.push(x);
-        return result.join("");
-    }
-;
+const tickFormatter = require("../src/tick-formatter");
 
 describe("tick-formatter", function () {
 
@@ -23,39 +10,35 @@ describe("tick-formatter", function () {
 
     [{
         tick: 0,
-        ms: 0,
-        s: 0,
-        m: 0,
-        digits: [0, 0, 0, 0, 0, 0, 0]
+        ms: "000",
+        time: "00:00"
 
     }, {
         tick: 347,
-        ms: 347,
-        s: 0,
-        m: 0,
-        digits: [0, 0, 0, 0, 3, 4, 7]
+        ms: "347",
+        time: "00:00"
 
     }, {
         tick: 54347,
-        ms: 347,
-        s: 54,
-        m: 0,
-        digits: [0, 0, 5, 4, 3, 4, 7]
+        ms: "347",
+        time: "00:54"
 
     }, {
         tick: 154348,
-        ms: 348,
-        s: 34,
-        m: 2,
-        digits: [0, 2, 3, 4, 3, 4, 8]
+        ms: "348",
+        time: "02:34"
 
-    }].forEach(({tick, ms, s, m, digits }) => {
-        it(`format tick into time details: ${tick} = ${zero(m)}:${zero(s)}.${zero(ms,4)}`, () => {
+    }, {
+        tick: 4474348,
+        ms: "348",
+        time: "74:34"
+
+    }].forEach(({tick, time, ms}) => {
+        it(`format tick into time details: ${tick} = ${time}.${ms}`, () => {
             let formatted = tickFormatter(tick);
+            // console.log(`${time}.${ms} =? ${formatted.time}.${formatted.ms}`);
+            assert(time === formatted.time);
             assert(ms === formatted.ms);
-            assert(s === formatted.s);
-            assert(m === formatted.m);
-            // digits.forEach((digit, position) => assert(formatted.digits[position] === digit));
         });
     });
 
