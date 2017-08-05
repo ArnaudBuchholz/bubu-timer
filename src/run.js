@@ -73,10 +73,10 @@ const
         document.getElementById("ms").innerHTML = `.${formattedRemaining.ms}`;
 
         if (convertedTick.step < sequence.length) {
-            document.getElementById("step").innerHTML = `${convertedTick.step + 1} / ${sequence.length}`;
+            document.getElementById("stepOn").innerHTML = `${convertedTick.step + 1} / ${sequence.length}`;
             requestAnimFrame(ticker.tick.bind(ticker));
         } else {
-            document.getElementById("step").innerHTML = "done.";
+            document.getElementById("stepOn").innerHTML = "done.";
         }
     },
 
@@ -158,7 +158,7 @@ const
                     "font-family": "Arial", "font-size": 0.1, x: 0.60, y: 0.1, "text-anchor": "end",
                     fill: colors.text.ms,
                     stroke: colors.text.ms, "stroke-opacity": 0.2, "stroke-width": 0.001}, ".123"),
-                text({id: "step",
+                text({id: "stepOn",
                     "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
                     fill: colors.text.step,
                     stroke: colors.text.step, "stroke-opacity": 0.2, "stroke-width": 0.01}, "1 / 2")
