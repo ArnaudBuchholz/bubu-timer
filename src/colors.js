@@ -4,7 +4,6 @@ module.exports = {
     background: "#ccd0d3",
     circle: {
         light: "#dce0e1",
-        shaded: "#c9ced1",
         dark: "#b3b7ba",
         background: "#a8acae"
     },
