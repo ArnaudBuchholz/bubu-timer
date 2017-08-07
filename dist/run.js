@@ -130,15 +130,17 @@ var TOTAL_OUTER = 0.98,
         step = 1 - convertedTick.remaining / currentDuration,
         formattedRemaining = tickFormatter(convertedTick.remaining);
 
-    document.getElementById("total").setAttribute("d", getCirclePath(total, TOTAL_OUTER, TOTAL_INNER));
-    document.getElementById("step").setAttribute("d", getCirclePath(step, STEP_OUTER, STEP_INNER));
     document.getElementById("time").innerHTML = formattedRemaining.time;
     document.getElementById("ms").innerHTML = "." + formattedRemaining.ms;
 
     if (convertedTick.step < sequence.length) {
+        document.getElementById("total").setAttribute("d", getCirclePath(total, TOTAL_OUTER, TOTAL_INNER));
+        document.getElementById("step").setAttribute("d", getCirclePath(step, STEP_OUTER, STEP_INNER));
         document.getElementById("stepOn").innerHTML = convertedTick.step + 1 + " / " + sequence.length;
         requestAnimFrame(ticker.tick.bind(ticker));
     } else {
+        document.getElementById("total").setAttribute("d", getCirclePath(0, TOTAL_OUTER, TOTAL_INNER));
+        document.getElementById("step").setAttribute("d", getCirclePath(0, STEP_OUTER, STEP_INNER));
         document.getElementById("stepOn").innerHTML = "done.";
     }
 },
@@ -193,13 +195,13 @@ var TOTAL_OUTER = 0.98,
     })).concat([text({ id: "time",
         "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
         fill: colors.text.time,
-        stroke: colors.text.time, "stroke-opacity": 0.2, "stroke-width": 0.01 }, "00:00"), text({ id: "ms",
+        stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01 }, "00:00"), text({ id: "ms",
         "font-family": "Arial", "font-size": 0.1, x: 0.60, y: 0.1, "text-anchor": "end",
         fill: colors.text.ms,
-        stroke: colors.text.ms, "stroke-opacity": 0.2, "stroke-width": 0.001 }, ".123"), text({ id: "stepOn",
+        stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, ".123"), text({ id: "stepOn",
         "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
         fill: colors.text.step,
-        stroke: colors.text.step, "stroke-opacity": 0.2, "stroke-width": 0.01 }, "1 / 2")])));
+        stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01 }, "1 / 2")])));
 };
 
 window.addEventListener("load", function () {
