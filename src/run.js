@@ -95,34 +95,16 @@ const
     circle = genSvgTag.bind(null, "circle"),
     text = genSvgTag.bind(null, "text"),
     path = genSvgTag.bind(null, "path"),
+    defs = genSvgTag.bind(null, "defs"),
+    linearGradient = genSvgTag.bind(null, "linearGradient"),
+    stop  = genSvgTag.bind(null, "stop"),
 
     progressContainer = ({outerRadius, innerRadius, id, color}) => {
-        let po1 = ratio2Coords(0.085, outerRadius),
-            po2 = ratio2Coords(0.165, outerRadius),
-            po3 = ratio2Coords(0.585, outerRadius),
-            po4 = ratio2Coords(0.665, outerRadius),
-            pi1 = ratio2Coords(0.085, innerRadius),
-            pi2 = ratio2Coords(0.165, innerRadius),
-            pi3 = ratio2Coords(0.585, innerRadius),
-            pi4 = ratio2Coords(0.665, innerRadius)
-        ;
         return [
-            circle({cx: 0, cy: 0, r: outerRadius, stroke: colors.circle.light, "stroke-width": 0.01,
+            circle({cx: 0, cy: 0, r: outerRadius, stroke: "url(#outerBorder)", "stroke-width": 0.01,
                 fill: colors.circle.background}),
-            circle({cx: 0, cy: 0, r: innerRadius, stroke: colors.circle.light, "stroke-width": 0.01,
+            circle({cx: 0, cy: 0, r: innerRadius, stroke: "url(#innerBorder)", "stroke-width": 0.01,
                 fill: colors.background}),
-            path({d: `M ${po1.x} ${po1.y} A ${outerRadius} ${outerRadius} 0 0 1 ${po2.x} ${po2.y}`,
-                fill: "transparent", stroke: colors.circle.shaded, "stroke-width": 0.01}),
-            path({d: `M ${po2.x} ${po2.y} A ${outerRadius} ${outerRadius} 0 0 1 ${po3.x} ${po3.y}`,
-                fill: "transparent", stroke: colors.circle.dark, "stroke-width": 0.01}),
-            path({d: `M ${po3.x} ${po3.y} A ${outerRadius} ${outerRadius} 0 0 1 ${po4.x} ${po4.y}`,
-                fill: "transparent", stroke: colors.circle.shaded, "stroke-width": 0.01}),
-            path({d: `M ${pi1.x} ${pi1.y} A ${innerRadius} ${innerRadius} 0 0 1 ${pi2.x} ${pi2.y}`,
-                fill: "transparent", stroke: colors.circle.shaded, "stroke-width": 0.01}),
-            path({d: `M ${pi2.x} ${pi2.y} A ${innerRadius} ${innerRadius} 0 0 1 ${pi3.x} ${pi3.y}`,
-                fill: "transparent", stroke: colors.circle.dark, "stroke-width": 0.01}),
-            path({d: `M ${pi3.x} ${pi3.y} A ${innerRadius} ${innerRadius} 0 0 1 ${pi4.x} ${pi4.y}`,
-                fill: "transparent", stroke: colors.circle.shaded, "stroke-width": 0.01}),
             path({id: id,
                 d: `M 0 -${outerRadius} A ${outerRadius} ${outerRadius} 0 0 1 ${outerRadius} 0
                 L ${innerRadius} 0 A ${innerRadius} ${innerRadius} 0 0 0 0 -${innerRadius} L 0 -${outerRadius}`,
@@ -137,12 +119,22 @@ const
             height: "100%",
             viewBox: "-1 -1 2 2",
             style: `background-color: ${colors.background};`
-        }, progressContainer({
-            outerRadius: TOTAL_OUTER,
-            innerRadius: TOTAL_INNER,
-            id: "total",
-            color: colors.progress.total
-        })
+        }, [defs({}, [
+            linearGradient({id: "outerBorder", x1: 0.5, x2: 0, y1: 0.5, y2: 0}, [
+                stop({offset: "0%", "stop-color": colors.circle.light}),
+                stop({offset: "100%", "stop-color": colors.circle.dark})
+            ]),
+            linearGradient({id: "innerBorder", x1: 0.5, x2: 0, y1: 0.5, y2: 0}, [
+                stop({offset: "0%", "stop-color": colors.circle.dark}),
+                stop({offset: "100%", "stop-color": colors.circle.light})
+            ])
+        ])]
+            .concat(progressContainer({
+                outerRadius: TOTAL_OUTER,
+                innerRadius: TOTAL_INNER,
+                id: "total",
+                color: colors.progress.total
+            }))
             .concat(progressContainer({
                 outerRadius: STEP_OUTER,
                 innerRadius: STEP_INNER,
