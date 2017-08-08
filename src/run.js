@@ -1,6 +1,6 @@
 "use strict";
 
-/*eslint-disable no-alert, no-undef, no-unused-vars*/
+/*eslint-disable no-alert*/
 
 const
     TOTAL_OUTER = 0.98,
