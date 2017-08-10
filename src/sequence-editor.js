@@ -10,8 +10,8 @@ const
         };
     },
 
-    _notify = (editor) => {
-        editor.callback(editor.sequence.map(tick => tickFormatter(tick).time));
+    _notify = (editor, lengthChanged) => {
+        editor.callback(editor.sequence.map(tick => tickFormatter(tick).time), lengthChanged || false);
     },
 
     _attach = (editor, callback) => {
@@ -30,8 +30,21 @@ const
 
     _add = (editor) => {
         editor.sequence.push(0);
-        _notify(editor);
-    };
+        _notify(editor, true);
+    },
+
+    _remove = (editor) => {
+        let sequence = editor.sequence,
+            hasRemainingItems = sequence.length > 1;
+        if (hasRemainingItems) {
+            sequence.pop();
+        } else {
+            sequence[0] = 0;
+        }
+        _notify(editor, hasRemainingItems);
+    },
+
+    _get = (editor) => editor.sequence;
 
 module.exports = {
 
@@ -41,9 +54,10 @@ module.exports = {
             on: callback => _attach(editor, callback),
             inc: (sec) => _inc(editor, sec),
             dec: (sec) => _inc(editor, -sec),
-            add: () => _add(editor)
+            add: () => _add(editor),
+            remove: () => _remove(editor),
+            get: () => _get(editor)
         };
-
     }
 
 };
