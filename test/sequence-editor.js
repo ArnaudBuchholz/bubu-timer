@@ -58,6 +58,15 @@ describe("sequence-editor", () => {
         }, {
             inc: 1,
             expected: ["00:03"]
+        }, {
+            inc: 10,
+            expected: ["00:13"]
+        }, {
+            inc: 60,
+            expected: ["01:13"]
+        }, {
+            inc: 3600,
+            expected: ["61:13"]
         }]);
 
         playScenario("scenario 2", [{
@@ -80,6 +89,12 @@ describe("sequence-editor", () => {
         }, {
             inc: 1,
             expected: ["00:01"]
+        }, {
+            inc: 60,
+            expected: ["01:01"]
+        }, {
+            dec: 3600,
+            expected: ["00:00"]
         }]);
 
     });
