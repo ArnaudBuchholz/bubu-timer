@@ -5,7 +5,7 @@ const
 
 describe("sequence-editor", () => {
 
-    ["on", "inc", "dec"].forEach(methodName => {
+    ["on", "inc", "dec", "add"].forEach(methodName => {
         it(`exposes ${methodName} method`, () => {
             let editor = sequenceEditor.allocate();
             assert("function" === typeof editor [methodName]);
@@ -20,34 +20,36 @@ describe("sequence-editor", () => {
         });
     });
 
-    describe("duration modification", () => {
-
-        const
-            playScenario = (label, scenario) => {
-                it(label, () => {
-                    let expected = ["00:00"],
-                        editor = sequenceEditor.allocate(),
-                        callbackCount = 0;
-                    editor.on(sequence => {
-                        assert(sequence.length === expected.length);
-                        expected.forEach((ms, pos) => {
-                            assert(sequence[pos] === ms);
-                        });
-                        ++callbackCount;
-                    });
+    const
+        playScenario = (label, scenario) => {
+            it(label, () => {
+                let expected = ["00:00"],
+                    editor = sequenceEditor.allocate(),
                     callbackCount = 0;
-                    scenario.forEach((item, index) => {
-                        assert(callbackCount === index);
-                        expected = item.expected;
-                        if (item.inc) {
-                            editor.inc(item.inc);
-                        } else if (item.dec) {
-                            editor.dec(item.dec);
-                        }
-                        assert(callbackCount === index + 1);
+                editor.on(sequence => {
+                    assert(sequence.length === expected.length);
+                    expected.forEach((ms, pos) => {
+                        assert(sequence[pos] === ms);
                     });
+                    ++callbackCount;
                 });
-            };
+                callbackCount = 0;
+                scenario.forEach((item, index) => {
+                    assert(callbackCount === index);
+                    expected = item.expected;
+                    if (item.inc) {
+                        editor.inc(item.inc);
+                    } else if (item.dec) {
+                        editor.dec(item.dec);
+                    } else if (item.add) {
+                        editor.add();
+                    }
+                    assert(callbackCount === index + 1);
+                });
+            });
+        };
+
+    describe("duration modification", () => {
 
         playScenario("scenario 1", [{
             inc: 1,
@@ -95,6 +97,24 @@ describe("sequence-editor", () => {
         }, {
             dec: 3600,
             expected: ["00:00"]
+        }]);
+
+    });
+
+    describe("adding duration", () => {
+
+        playScenario("scenario 1", [{
+            inc: 60,
+            expected: ["01:00"]
+        }, {
+            add: true,
+            expected: ["01:00", "00:00"]
+        }, {
+            inc: 30,
+            expected: ["01:00", "00:30"]
+        }, {
+            dec: 10,
+            expected: ["01:00", "00:20"]
         }]);
 
     });
