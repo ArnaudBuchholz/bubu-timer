@@ -26,6 +26,11 @@ const
         }
         editor.sequence.push(top);
         _notify(editor);
+    },
+
+    _add = (editor) => {
+        editor.sequence.push(0);
+        _notify(editor);
     };
 
 module.exports = {
@@ -35,7 +40,8 @@ module.exports = {
         return {
             on: callback => _attach(editor, callback),
             inc: (sec) => _inc(editor, sec),
-            dec: (sec) => _inc(editor, -sec)
+            dec: (sec) => _inc(editor, -sec),
+            add: () => _add(editor)
         };
 
     }
