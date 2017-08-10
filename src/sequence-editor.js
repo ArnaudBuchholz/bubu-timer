@@ -1,36 +1,43 @@
 "use strict";
 
-let
-    _callback = () => {},
-    _sequence;
-
 const
-    _notify = () => {
-        _callback(_sequence);
+    tickFormatter = require("./tick-formatter"),
+
+    _allocate = () => {
+        return {
+            callback: () => {},
+            sequence: [0]
+        };
     },
 
-    _update = ms => {
-        let current = _sequence.pop() + ms;
-        if (current < 0) {
-            current = 0;
+    _notify = (editor) => {
+        editor.callback(editor.sequence.map(tick => tickFormatter(tick).time));
+    },
+
+    _attach = (editor, callback) => {
+        editor.callback = callback;
+        _notify(editor);
+    },
+
+    _inc = (editor, sec) => {
+        let top = editor.sequence.pop() + sec * 1000;
+        if (top < 0) {
+            top = 0;
         }
-        _sequence.push(current);
-        _notify();
+        editor.sequence.push(top);
+        _notify(editor);
     };
 
 module.exports = {
 
-    on: callback => {
-        _callback = callback;
-    },
+    allocate: function () {
+        let editor = _allocate();
+        return {
+            on: callback => _attach(editor, callback),
+            inc: (sec) => _inc(editor, sec),
+            dec: (sec) => _inc(editor, -sec)
+        };
 
-    reset: (defaultValue = 0) => {
-        _sequence = [defaultValue];
-        _notify();
-    },
-
-    add: ms => _update(ms),
-
-    sub: ms => _update(-ms)
+    }
 
 };
