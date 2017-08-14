@@ -60,15 +60,35 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(1);
+"use strict";
 
+
+var _tag = function _tag(tagName, properties, children) {
+    var element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
+    Object.keys(properties).forEach(function (name) {
+        element.setAttribute(name, properties[name]);
+    });
+    [].concat(children || []).map(function (def) {
+        return typeof def === "string" ? document.createTextNode(def) : def;
+    }).forEach(function (node) {
+        return element.appendChild(node);
+    });
+    return element;
+},
+    _svg = _tag.bind(null, "svg");
+
+["circle", "text", "path", "defs", "linearGradient", "stop"].forEach(function (tag) {
+    _svg[tag] = _tag.bind(null, tag);
+});
+
+module.exports = _svg;
 
 /***/ }),
 /* 1 */
@@ -77,17 +97,65 @@ module.exports = __webpack_require__(1);
 "use strict";
 
 
-/*eslint-disable no-alert, no-undef, no-unused-vars*/
+module.exports = {
+    background: "#ccd0d3",
+    circle: {
+        light: "#dce0e1",
+        dark: "#b3b7ba",
+        background: "#a8acae"
+    },
+    progress: {
+        total: "#def1f2",
+        step: "#f3dfe6"
+    },
+    text: {
+        time: "#ffffff",
+        ms: "#ffffff",
+        step: "#000000"
+    }
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var svg = __webpack_require__(0),
+    colors = __webpack_require__(1);
+
+module.exports = function () {
+    return svg.defs({}, [svg.linearGradient({ id: "outerBorder", x1: 0.5, x2: 0, y1: 0.5, y2: 0 }, [svg.stop({ offset: "0%", "stop-color": colors.circle.light }), svg.stop({ offset: "100%", "stop-color": colors.circle.dark })]), svg.linearGradient({ id: "innerBorder", x1: 0.5, x2: 0, y1: 0.5, y2: 0 }, [svg.stop({ offset: "0%", "stop-color": colors.circle.dark }), svg.stop({ offset: "100%", "stop-color": colors.circle.light })])]);
+};
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(4);
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/*eslint-disable no-alert*/
 
 var TOTAL_OUTER = 0.98,
     TOTAL_INNER = 0.88,
     STEP_OUTER = 0.83,
     STEP_INNER = 0.73,
-    colors = __webpack_require__(2),
-    sequenceSerializer = __webpack_require__(3),
-    tickGenerator = __webpack_require__(4),
-    tickConverter = __webpack_require__(5),
-    tickFormatter = __webpack_require__(6),
+    svg = __webpack_require__(0),
+    colors = __webpack_require__(1),
+    gradients = __webpack_require__(2),
+    sequenceSerializer = __webpack_require__(5),
+    tickGenerator = __webpack_require__(6),
+    tickConverter = __webpack_require__(7),
+    tickFormatter = __webpack_require__(8),
     defaultRequestAnimFrame = function defaultRequestAnimFrame(callback) {
     return setTimeout(callback, 1000 / 60);
 },
@@ -144,34 +212,15 @@ var TOTAL_OUTER = 0.98,
         document.getElementById("stepOn").innerHTML = "done.";
     }
 },
-    genSvgTag = function genSvgTag(tagName, properties, children) {
-    var element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
-    Object.keys(properties).forEach(function (name) {
-        element.setAttribute(name, properties[name]);
-    });
-    [].concat(children || []).map(function (def) {
-        return typeof def === "string" ? document.createTextNode(def) : def;
-    }).forEach(function (node) {
-        return element.appendChild(node);
-    });
-    return element;
-},
-    svg = genSvgTag.bind(null, "svg"),
-    circle = genSvgTag.bind(null, "circle"),
-    text = genSvgTag.bind(null, "text"),
-    path = genSvgTag.bind(null, "path"),
-    defs = genSvgTag.bind(null, "defs"),
-    linearGradient = genSvgTag.bind(null, "linearGradient"),
-    stop = genSvgTag.bind(null, "stop"),
     progressContainer = function progressContainer(_ref) {
     var outerRadius = _ref.outerRadius,
         innerRadius = _ref.innerRadius,
         id = _ref.id,
         color = _ref.color;
 
-    return [circle({ cx: 0, cy: 0, r: outerRadius, stroke: "url(#outerBorder)", "stroke-width": 0.01,
-        fill: colors.circle.background }), circle({ cx: 0, cy: 0, r: innerRadius, stroke: "url(#innerBorder)", "stroke-width": 0.01,
-        fill: colors.background }), path({ id: id,
+    return [svg.circle({ cx: 0, cy: 0, r: outerRadius, stroke: "url(#outerBorder)", "stroke-width": 0.01,
+        fill: colors.circle.background }), svg.circle({ cx: 0, cy: 0, r: innerRadius, stroke: "url(#innerBorder)", "stroke-width": 0.01,
+        fill: colors.background }), svg.path({ id: id,
         d: "M 0 -" + outerRadius + " A " + outerRadius + " " + outerRadius + " 0 0 1 " + outerRadius + " 0\n                L " + innerRadius + " 0 A " + innerRadius + " " + innerRadius + " 0 0 0 0 -" + innerRadius + " L 0 -" + outerRadius,
         fill: color, stroke: color, "stroke-opacity": 0.2, "stroke-width": 0.01 })];
 },
@@ -182,7 +231,7 @@ var TOTAL_OUTER = 0.98,
         height: "100%",
         viewBox: "-1 -1 2 2",
         style: "background-color: " + colors.background + ";"
-    }, [defs({}, [linearGradient({ id: "outerBorder", x1: 0.5, x2: 0, y1: 0.5, y2: 0 }, [stop({ offset: "0%", "stop-color": colors.circle.light }), stop({ offset: "100%", "stop-color": colors.circle.dark })]), linearGradient({ id: "innerBorder", x1: 0.5, x2: 0, y1: 0.5, y2: 0 }, [stop({ offset: "0%", "stop-color": colors.circle.dark }), stop({ offset: "100%", "stop-color": colors.circle.light })])])].concat(progressContainer({
+    }, [gradients()].concat(progressContainer({
         outerRadius: TOTAL_OUTER,
         innerRadius: TOTAL_INNER,
         id: "total",
@@ -192,13 +241,13 @@ var TOTAL_OUTER = 0.98,
         innerRadius: STEP_INNER,
         id: "step",
         color: colors.progress.step
-    })).concat([text({ id: "time",
+    })).concat([svg.text({ id: "time",
         "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
         fill: colors.text.time,
-        stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01 }, "00:00"), text({ id: "ms",
+        stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01 }, "00:00"), svg.text({ id: "ms",
         "font-family": "Arial", "font-size": 0.1, x: 0.60, y: 0.1, "text-anchor": "end",
         fill: colors.text.ms,
-        stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, ".123"), text({ id: "stepOn",
+        stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, ".123"), svg.text({ id: "stepOn",
         "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
         fill: colors.text.step,
         stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01 }, "1 / 2")])));
@@ -222,32 +271,7 @@ window.addEventListener("click", function () {
 });
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-    background: "#ccd0d3",
-    circle: {
-        light: "#dce0e1",
-        dark: "#b3b7ba",
-        background: "#a8acae"
-    },
-    progress: {
-        total: "#def1f2",
-        step: "#f3dfe6"
-    },
-    text: {
-        time: "#ffffff",
-        ms: "#ffffff",
-        step: "#000000"
-    }
-};
-
-/***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -270,7 +294,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -344,7 +368,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -369,7 +393,7 @@ module.exports = function (elapsed, sequence) {
 };
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
