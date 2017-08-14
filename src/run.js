@@ -7,7 +7,9 @@ const
     TOTAL_INNER = 0.88,
     STEP_OUTER  = 0.83,
     STEP_INNER  = 0.73,
+    svg = require("./svg"),
     colors = require("./colors"),
+    gradients = require("./gradients"),
     sequenceSerializer = require("./sequence-serializer"),
     tickGenerator = require("./tick-generator"),
     tickConverter = require("./tick-converter"),
@@ -82,32 +84,13 @@ const
         }
     },
 
-    genSvgTag = function (tagName, properties, children) {
-        let element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
-        Object.keys(properties).forEach(name => {
-            element.setAttribute(name, properties[name]);
-        });
-        [].concat(children || [])
-            .map(def => typeof def === "string" ? document.createTextNode(def) : def)
-            .forEach(node => element.appendChild(node));
-        return element;
-    },
-
-    svg = genSvgTag.bind(null, "svg"),
-    circle = genSvgTag.bind(null, "circle"),
-    text = genSvgTag.bind(null, "text"),
-    path = genSvgTag.bind(null, "path"),
-    defs = genSvgTag.bind(null, "defs"),
-    linearGradient = genSvgTag.bind(null, "linearGradient"),
-    stop  = genSvgTag.bind(null, "stop"),
-
     progressContainer = ({outerRadius, innerRadius, id, color}) => {
         return [
-            circle({cx: 0, cy: 0, r: outerRadius, stroke: "url(#outerBorder)", "stroke-width": 0.01,
+            svg.circle({cx: 0, cy: 0, r: outerRadius, stroke: "url(#outerBorder)", "stroke-width": 0.01,
                 fill: colors.circle.background}),
-            circle({cx: 0, cy: 0, r: innerRadius, stroke: "url(#innerBorder)", "stroke-width": 0.01,
+            svg.circle({cx: 0, cy: 0, r: innerRadius, stroke: "url(#innerBorder)", "stroke-width": 0.01,
                 fill: colors.background}),
-            path({id: id,
+            svg.path({id: id,
                 d: `M 0 -${outerRadius} A ${outerRadius} ${outerRadius} 0 0 1 ${outerRadius} 0
                 L ${innerRadius} 0 A ${innerRadius} ${innerRadius} 0 0 0 0 -${innerRadius} L 0 -${outerRadius}`,
                 fill: color, stroke: color, "stroke-opacity": 0.2, "stroke-width": 0.01})
@@ -121,16 +104,7 @@ const
             height: "100%",
             viewBox: "-1 -1 2 2",
             style: `background-color: ${colors.background};`
-        }, [defs({}, [
-            linearGradient({id: "outerBorder", x1: 0.5, x2: 0, y1: 0.5, y2: 0}, [
-                stop({offset: "0%", "stop-color": colors.circle.light}),
-                stop({offset: "100%", "stop-color": colors.circle.dark})
-            ]),
-            linearGradient({id: "innerBorder", x1: 0.5, x2: 0, y1: 0.5, y2: 0}, [
-                stop({offset: "0%", "stop-color": colors.circle.dark}),
-                stop({offset: "100%", "stop-color": colors.circle.light})
-            ])
-        ])]
+        }, [gradients()]
             .concat(progressContainer({
                 outerRadius: TOTAL_OUTER,
                 innerRadius: TOTAL_INNER,
@@ -144,15 +118,15 @@ const
                 color: colors.progress.step
             }))
             .concat([
-                text({id: "time",
+                svg.text({id: "time",
                     "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
                     fill: colors.text.time,
                     stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01}, "00:00"),
-                text({id: "ms",
+                svg.text({id: "ms",
                     "font-family": "Arial", "font-size": 0.1, x: 0.60, y: 0.1, "text-anchor": "end",
                     fill: colors.text.ms,
                     stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001}, ".123"),
-                text({id: "stepOn",
+                svg.text({id: "stepOn",
                     "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
                     fill: colors.text.step,
                     stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01}, "1 / 2")
