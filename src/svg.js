@@ -20,7 +20,8 @@ const
     "path",
     "defs",
     "linearGradient",
-    "stop"
+    "stop",
+    "rect"
 
 ].forEach(tag => {
     _svg[tag] = _tag.bind(null, tag);
