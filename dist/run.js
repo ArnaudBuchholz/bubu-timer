@@ -84,7 +84,7 @@ var _tag = function _tag(tagName, properties, children) {
 },
     _svg = _tag.bind(null, "svg");
 
-["circle", "text", "path", "defs", "linearGradient", "stop"].forEach(function (tag) {
+["circle", "text", "path", "defs", "linearGradient", "stop", "rect"].forEach(function (tag) {
     _svg[tag] = _tag.bind(null, tag);
 });
 
