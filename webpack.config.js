@@ -12,6 +12,9 @@ module.exports = {
         run: [
             "./src/run.js",
         ],
+        edit: [
+            "./src/edit.js",
+        ]
     },
 
     output: {
