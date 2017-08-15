@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -84,7 +84,7 @@ var _tag = function _tag(tagName, properties, children) {
 },
     _svg = _tag.bind(null, "svg");
 
-["circle", "text", "path", "defs", "linearGradient", "stop", "rect"].forEach(function (tag) {
+["circle", "text", "path", "defs", "linearGradient", "stop", "rect", "g"].forEach(function (tag) {
     _svg[tag] = _tag.bind(null, tag);
 });
 
@@ -133,11 +133,40 @@ module.exports = function () {
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(4);
+"use strict";
 
+
+var _zero = function _zero(x) {
+    var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+
+    var result = [],
+        max = Math.pow(10, count - 1);
+    while (max > 1 && x < max) {
+        result.push("0");
+        max /= 10;
+    }
+    result.push(x);
+    return result.join("");
+};
+
+module.exports = function (tick) {
+    var ms = _zero(tick % 1000, 3),
+        seconds = (tick - ms) / 1000,
+        s = _zero(seconds % 60),
+        m = _zero((seconds - s) / 60),
+        time = m + ":" + s;
+    return { time: time, ms: ms };
+};
 
 /***/ }),
 /* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(5);
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -152,10 +181,10 @@ var TOTAL_OUTER = 0.98,
     svg = __webpack_require__(0),
     colors = __webpack_require__(1),
     gradients = __webpack_require__(2),
-    sequenceSerializer = __webpack_require__(5),
-    tickGenerator = __webpack_require__(6),
-    tickConverter = __webpack_require__(7),
-    tickFormatter = __webpack_require__(8),
+    sequenceSerializer = __webpack_require__(6),
+    tickGenerator = __webpack_require__(7),
+    tickConverter = __webpack_require__(8),
+    tickFormatter = __webpack_require__(3),
     defaultRequestAnimFrame = function defaultRequestAnimFrame(callback) {
     return setTimeout(callback, 1000 / 60);
 },
@@ -271,7 +300,7 @@ window.addEventListener("click", function () {
 });
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -294,7 +323,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -368,7 +397,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -390,35 +419,6 @@ module.exports = function (elapsed, sequence) {
         return false;
     });
     return { step: step, remaining: remaining };
-};
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _zero = function _zero(x) {
-    var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
-
-    var result = [],
-        max = Math.pow(10, count - 1);
-    while (max > 1 && x < max) {
-        result.push("0");
-        max /= 10;
-    }
-    result.push(x);
-    return result.join("");
-};
-
-module.exports = function (tick) {
-    var ms = _zero(tick % 1000, 3),
-        seconds = (tick - ms) / 1000,
-        s = _zero(seconds % 60),
-        m = _zero((seconds - s) / 60),
-        time = m + ":" + s;
-    return { time: time, ms: ms };
 };
 
 /***/ })
