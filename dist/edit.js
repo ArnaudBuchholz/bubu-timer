@@ -84,7 +84,7 @@ var _tag = function _tag(tagName, properties, children) {
 },
     _svg = _tag.bind(null, "svg");
 
-["circle", "text", "path", "defs", "linearGradient", "stop", "rect"].forEach(function (tag) {
+["circle", "text", "path", "defs", "linearGradient", "stop", "rect", "g"].forEach(function (tag) {
     _svg[tag] = _tag.bind(null, tag);
 });
 
@@ -130,7 +130,35 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 3 */,
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _zero = function _zero(x) {
+    var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+
+    var result = [],
+        max = Math.pow(10, count - 1);
+    while (max > 1 && x < max) {
+        result.push("0");
+        max /= 10;
+    }
+    result.push(x);
+    return result.join("");
+};
+
+module.exports = function (tick) {
+    var ms = _zero(tick % 1000, 3),
+        seconds = (tick - ms) / 1000,
+        s = _zero(seconds % 60),
+        m = _zero((seconds - s) / 60),
+        time = m + ":" + s;
+    return { time: time, ms: ms };
+};
+
+/***/ }),
 /* 4 */,
 /* 5 */,
 /* 6 */,
@@ -154,12 +182,31 @@ module.exports = __webpack_require__(10);
 var svg = __webpack_require__(0),
     colors = __webpack_require__(1),
     gradients = __webpack_require__(2),
-    digit = function digit(x, baseId) {
+    sequenceEditor = __webpack_require__(11).allocate(),
+    createDigit = function createDigit(x, baseId) {
+    var textProperties = {
+        "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
+        fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
+    };
     return [svg.rect({ x: x - 0.1, y: -0.8, width: 0.2, height: 0.4,
-        fill: colors.circle.background, stroke: "url(#outerBorder)", "stroke-width": 0.01 }), svg.text({ id: "inc" + baseId, x: x, y: -0.8, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
-        fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, "⏶"), svg.text({ id: "dig" + baseId, x: x, y: -0.5, "font-family": "Arial", "font-size": 0.3, "text-anchor": "middle",
-        fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, "0"), svg.text({ id: "dec" + baseId, x: x, y: -0.28, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
-        fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, "⏷")];
+        fill: colors.circle.background, stroke: "url(#outerBorder)", "stroke-width": 0.01 }), svg.text(Object.assign({ id: "inc" + baseId, x: x, y: -0.8 }, textProperties), "⏶"), svg.text(Object.assign({ id: "dig" + baseId, x: x, y: -0.52 }, textProperties), ""), svg.text(Object.assign({ id: "dec" + baseId, x: x, y: -0.26 }, textProperties), "⏷")];
+},
+    createButton = function createButton(_ref) {
+    var id = _ref.id,
+        cx = _ref.cx,
+        x = _ref.x,
+        y = _ref.y,
+        label = _ref.label;
+    return [svg.g({ id: id }, [svg.circle({ r: 0.15, cx: cx, cy: 0.7,
+        fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01 }), svg.text({ x: x, y: y, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
+        fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, label)])];
+},
+    refresh = function refresh(sequence /*, lengthChanged*/) {
+    var current = sequence[sequence.length - 1];
+    [0, 1, 3, 4].forEach(function (pos, digit) {
+        document.getElementById("dig" + digit).innerHTML = current.substr(pos, 1);
+    });
+    // alert(sequence, lengthChanged);
 },
     setup = function setup() {
     document.body.appendChild(svg({
@@ -167,10 +214,125 @@ var svg = __webpack_require__(0),
         height: "100%",
         viewBox: "-1 -1 2 2",
         style: "background-color: " + colors.background + ";"
-    }, [gradients()].concat(digit(-0.4, 0), digit(-0.15, 1), digit(0.15, 2), digit(0.4, 3))));
+    }, [gradients()].concat(createDigit(-0.4, 0), createDigit(-0.15, 1), createDigit(0.15, 2), createDigit(0.4, 3)).concat(createButton({ id: "remove", cx: -0.4, x: -0.4, y: 0.75, label: "⎌" }), createButton({ id: "add", cx: 0, x: 0, y: 0.77, label: "+" }), createButton({ id: "run", cx: 0.4, x: 0.42, y: 0.77, label: "▶" }))));
+    sequenceEditor.on(refresh);
+},
+    noop = function noop() {},
+    mapping = {
+    inc0: function inc0() {
+        return sequenceEditor.inc(600);
+    },
+    dec0: function dec0() {
+        return sequenceEditor.dec(600);
+    },
+    inc1: function inc1() {
+        return sequenceEditor.inc(60);
+    },
+    dec1: function dec1() {
+        return sequenceEditor.dec(60);
+    },
+    inc2: function inc2() {
+        return sequenceEditor.inc(10);
+    },
+    dec2: function dec2() {
+        return sequenceEditor.dec(10);
+    },
+    inc3: function inc3() {
+        return sequenceEditor.inc(1);
+    },
+    dec3: function dec3() {
+        return sequenceEditor.dec(1);
+    }
 };
 
 window.addEventListener("load", setup);
+
+window.addEventListener("click", function (e) {
+    var target = e.target,
+        id = void 0;
+    while (!id && target) {
+        id = target.id;
+        target = target.parentNode;
+    }
+    (mapping[id] || noop)();
+});
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var tickFormatter = __webpack_require__(3),
+    _allocate = function _allocate() {
+    return {
+        callback: function callback() {},
+        sequence: [0]
+    };
+},
+    _notify = function _notify(editor, lengthChanged) {
+    editor.callback(editor.sequence.map(function (tick) {
+        return tickFormatter(tick).time;
+    }), lengthChanged || false);
+},
+    _attach = function _attach(editor, callback) {
+    editor.callback = callback;
+    _notify(editor);
+},
+    _inc = function _inc(editor, sec) {
+    var top = editor.sequence.pop() + sec * 1000;
+    if (top < 0) {
+        top = 0;
+    }
+    editor.sequence.push(top);
+    _notify(editor);
+},
+    _add = function _add(editor) {
+    editor.sequence.push(0);
+    _notify(editor, true);
+},
+    _remove = function _remove(editor) {
+    var sequence = editor.sequence,
+        hasRemainingItems = sequence.length > 1;
+    if (hasRemainingItems) {
+        sequence.pop();
+    } else {
+        sequence[0] = 0;
+    }
+    _notify(editor, hasRemainingItems);
+},
+    _get = function _get(editor) {
+    return editor.sequence;
+};
+
+module.exports = {
+
+    allocate: function allocate() {
+        var editor = _allocate();
+        return {
+            on: function on(callback) {
+                return _attach(editor, callback);
+            },
+            inc: function inc(sec) {
+                return _inc(editor, sec);
+            },
+            dec: function dec(sec) {
+                return _inc(editor, -sec);
+            },
+            add: function add() {
+                return _add(editor);
+            },
+            remove: function remove() {
+                return _remove(editor);
+            },
+            get: function get() {
+                return _get(editor);
+            }
+        };
+    }
+
+};
 
 /***/ })
 /******/ ]);
