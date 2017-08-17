@@ -44,7 +44,12 @@ const
         _notify(editor, hasRemainingItems);
     },
 
-    _get = (editor) => editor.sequence;
+    _get = (editor) => editor.sequence,
+
+    _set = (editor, sequence) => {
+        editor.sequence = Array.isArray(sequence) && sequence.length ? [].concat(sequence) : [0];
+        _notify(editor, true);
+    };
 
 module.exports = {
 
@@ -56,7 +61,8 @@ module.exports = {
             dec: (sec) => _inc(editor, -sec),
             add: () => _add(editor),
             remove: () => _remove(editor),
-            get: () => _get(editor)
+            get: () => _get(editor),
+            set: (sequence) => _set(editor, sequence)
         };
     }
 
