@@ -15,6 +15,9 @@ const
     tickConverter = require("./tick-converter"),
     tickFormatter = require("./tick-formatter"),
 
+    alarm1 = new Audio(require("./res/alarm1.mp3")),
+    alarm2 = new Audio(require("./res/alarm2.mp3")),
+
     defaultRequestAnimFrame = callback => setTimeout(callback, 1000 / 60),
 
     requestAnimFrame = window.requestAnimationFrame
@@ -146,8 +149,10 @@ window.addEventListener("load", () => {
 
 window.addEventListener("click", () => {
     if (ticker.isPaused()) {
+        alarm1.play();
         ticker.resume();
     } else {
+        alarm2.play();
         ticker.pause();
     }
 });
