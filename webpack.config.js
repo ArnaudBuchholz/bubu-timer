@@ -27,6 +27,7 @@ module.exports = {
         extensions: [
             ".js",
             ".json",
+            ".mp3"
         ],
     },
 
@@ -41,6 +42,11 @@ module.exports = {
                 }
             }, {
                 loader: "eslint-loader"
+            }]
+        }, {
+            test: /\.mp3$/,
+            use: [{
+                loader: "url-loader",
             }]
         }],
     },
