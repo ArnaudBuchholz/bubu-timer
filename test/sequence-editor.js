@@ -25,7 +25,8 @@ describe("sequence-editor", () => {
             inc: (editor, seconds) => editor.inc(seconds),
             dec: (editor, seconds) => editor.dec(seconds),
             add: editor => editor.add(),
-            remove: editor => editor.remove()
+            remove: editor => editor.remove(),
+            set: (editor, sequence) => editor.set(sequence)
         },
         playScenario = (label, scenario, expectedSequence) => {
             it(label, () => {
@@ -48,7 +49,7 @@ describe("sequence-editor", () => {
                     let action = Object.keys(item).filter(name => name !== "expected")[0];
                     expectedLengthChanged = undefined !== item.expectedLengthChanged
                         ? item.expectedLengthChanged
-                        : -1 !== ["add", "remove"].indexOf(action);
+                        : -1 !== ["add", "remove", "set"].indexOf(action);
                     actions[action](editor, item[action], item);
                     assert(callbackCount === index + 1);
                 });
@@ -167,5 +168,22 @@ describe("sequence-editor", () => {
         }], [0]);
 
     });
-});
 
+    describe("initializing sequence", () => {
+
+        playScenario("scenario 1", [{
+            set: [60000],
+            expected: ["01:00"]
+        }, {
+            inc: 30,
+            expected: ["01:30"]
+        }], [90000]);
+
+        playScenario("scenario 2", [{
+            set: [],
+            expected: ["00:00"]
+        }], [0]);
+
+    });
+
+});
