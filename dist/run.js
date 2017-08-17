@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -136,6 +136,29 @@ module.exports = function () {
 "use strict";
 
 
+var _read = function _read(string) {
+    return string ? string.split(",").map(function (time) {
+        return 1000 * parseInt(time, 10);
+    }) : [];
+},
+    _write = function _write(sequence) {
+    return sequence.map(function (time) {
+        return Math.floor(time / 1000);
+    }).join(",");
+};
+
+module.exports = {
+    read: _read,
+    write: _write
+};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _zero = function _zero(x) {
     var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
 
@@ -159,14 +182,14 @@ module.exports = function (tick) {
 };
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(5);
+module.exports = __webpack_require__(6);
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -181,10 +204,10 @@ var TOTAL_OUTER = 0.98,
     svg = __webpack_require__(0),
     colors = __webpack_require__(1),
     gradients = __webpack_require__(2),
-    sequenceSerializer = __webpack_require__(6),
+    sequenceSerializer = __webpack_require__(3),
     tickGenerator = __webpack_require__(7),
     tickConverter = __webpack_require__(8),
-    tickFormatter = __webpack_require__(3),
+    tickFormatter = __webpack_require__(4),
     defaultRequestAnimFrame = function defaultRequestAnimFrame(callback) {
     return setTimeout(callback, 1000 / 60);
 },
@@ -298,29 +321,6 @@ window.addEventListener("click", function () {
         ticker.pause();
     }
 });
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _read = function _read(string) {
-    return string ? string.split(",").map(function (time) {
-        return 1000 * parseInt(time, 10);
-    }) : [];
-},
-    _write = function _write(sequence) {
-    return sequence.map(function (time) {
-        return Math.floor(time / 1000);
-    }).join(",");
-};
-
-module.exports = {
-    read: _read,
-    write: _write
-};
 
 /***/ }),
 /* 7 */

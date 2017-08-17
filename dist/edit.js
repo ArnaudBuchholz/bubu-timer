@@ -136,6 +136,29 @@ module.exports = function () {
 "use strict";
 
 
+var _read = function _read(string) {
+    return string ? string.split(",").map(function (time) {
+        return 1000 * parseInt(time, 10);
+    }) : [];
+},
+    _write = function _write(sequence) {
+    return sequence.map(function (time) {
+        return Math.floor(time / 1000);
+    }).join(",");
+};
+
+module.exports = {
+    read: _read,
+    write: _write
+};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _zero = function _zero(x) {
     var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
 
@@ -159,7 +182,6 @@ module.exports = function (tick) {
 };
 
 /***/ }),
-/* 4 */,
 /* 5 */,
 /* 6 */,
 /* 7 */,
@@ -177,19 +199,20 @@ module.exports = __webpack_require__(10);
 "use strict";
 
 
-/*eslint-disable no-alert*/
+/*global location*/
 
 var svg = __webpack_require__(0),
     colors = __webpack_require__(1),
     gradients = __webpack_require__(2),
     sequenceEditor = __webpack_require__(11).allocate(),
+    sequenceSerializer = __webpack_require__(3),
+    digitProperties = {
+    "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
+    fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
+},
     createDigit = function createDigit(x, baseId) {
-    var textProperties = {
-        "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
-        fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
-    };
     return [svg.rect({ x: x - 0.1, y: -0.8, width: 0.2, height: 0.4,
-        fill: colors.circle.background, stroke: "url(#outerBorder)", "stroke-width": 0.01 }), svg.text(Object.assign({ id: "inc" + baseId, x: x, y: -0.8 }, textProperties), "⏶"), svg.text(Object.assign({ id: "dig" + baseId, x: x, y: -0.52 }, textProperties), ""), svg.text(Object.assign({ id: "dec" + baseId, x: x, y: -0.26 }, textProperties), "⏷")];
+        fill: colors.circle.background, stroke: "url(#outerBorder)", "stroke-width": 0.01 }), svg.text(Object.assign({ id: "inc" + baseId, x: x, y: -0.8 }, digitProperties), "⏶"), svg.text(Object.assign({ id: "dig" + baseId, x: x, y: -0.52 }, digitProperties), ""), svg.text(Object.assign({ id: "dec" + baseId, x: x, y: -0.26 }, digitProperties), "⏷")];
 },
     createButton = function createButton(_ref) {
     var id = _ref.id,
@@ -201,12 +224,25 @@ var svg = __webpack_require__(0),
         fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01 }), svg.text({ x: x, y: y, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
         fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, label)])];
 },
+    encodedSequence = function encodedSequence() {
+    return sequenceSerializer.write(sequenceEditor.get());
+},
     refresh = function refresh(sequence /*, lengthChanged*/) {
-    var current = sequence[sequence.length - 1];
+    var current = sequence[sequence.length - 1],
+        list = document.getElementById("list");
     [0, 1, 3, 4].forEach(function (pos, digit) {
         document.getElementById("dig" + digit).innerHTML = current.substr(pos, 1);
     });
-    // alert(sequence, lengthChanged);
+    list.innerHTML = ""; // clean
+    sequence.forEach(function (time, index) {
+        list.appendChild(svg.text({
+            x: -0.5 + 0.45 * (index % 4),
+            y: 0.15 * Math.floor(index / 4),
+            "font-family": "Arial", "font-size": 0.15, "text-anchor": "end",
+            fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
+        }, time));
+    });
+    location.hash = encodedSequence();
 },
     setup = function setup() {
     document.body.appendChild(svg({
@@ -214,7 +250,8 @@ var svg = __webpack_require__(0),
         height: "100%",
         viewBox: "-1 -1 2 2",
         style: "background-color: " + colors.background + ";"
-    }, [gradients()].concat(createDigit(-0.4, 0), createDigit(-0.15, 1), createDigit(0.15, 2), createDigit(0.4, 3)).concat(createButton({ id: "remove", cx: -0.4, x: -0.4, y: 0.75, label: "⎌" }), createButton({ id: "add", cx: 0, x: 0, y: 0.77, label: "+" }), createButton({ id: "run", cx: 0.4, x: 0.42, y: 0.77, label: "▶" }))));
+    }, [gradients()].concat(createDigit(-0.4, 0), createDigit(-0.15, 1), svg.text(Object.assign({ x: 0, y: -0.52 }, digitProperties), ":"), createDigit(0.15, 2), createDigit(0.4, 3)).concat(createButton({ id: "remove", cx: -0.4, x: -0.4, y: 0.75, label: "⎌" }), createButton({ id: "add", cx: 0, x: 0, y: 0.77, label: "+" }), createButton({ id: "run", cx: 0.4, x: 0.42, y: 0.77, label: "▶" }), svg.g({ id: "list" }))));
+    sequenceEditor.set(sequenceSerializer.read(location.hash.substr(1)));
     sequenceEditor.on(refresh);
 },
     noop = function noop() {},
@@ -242,6 +279,15 @@ var svg = __webpack_require__(0),
     },
     dec3: function dec3() {
         return sequenceEditor.dec(1);
+    },
+    add: function add() {
+        return sequenceEditor.get().length < 16 ? sequenceEditor.add() : 0;
+    },
+    remove: function remove() {
+        return sequenceEditor.remove();
+    },
+    run: function run() {
+        window.location = "run.html?" + encodedSequence();
     }
 };
 
@@ -264,7 +310,7 @@ window.addEventListener("click", function (e) {
 "use strict";
 
 
-var tickFormatter = __webpack_require__(3),
+var tickFormatter = __webpack_require__(4),
     _allocate = function _allocate() {
     return {
         callback: function callback() {},
@@ -304,6 +350,10 @@ var tickFormatter = __webpack_require__(3),
 },
     _get = function _get(editor) {
     return editor.sequence;
+},
+    _set = function _set(editor, sequence) {
+    editor.sequence = Array.isArray(sequence) && sequence.length ? [].concat(sequence) : [0];
+    _notify(editor, true);
 };
 
 module.exports = {
@@ -328,6 +378,9 @@ module.exports = {
             },
             get: function get() {
                 return _get(editor);
+            },
+            set: function set(sequence) {
+                return _set(editor, sequence);
             }
         };
     }
