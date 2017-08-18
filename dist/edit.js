@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -186,16 +186,14 @@ module.exports = function (tick) {
 /* 6 */,
 /* 7 */,
 /* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(12);
+module.exports = __webpack_require__(10);
 
 
 /***/ }),
-/* 12 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -206,7 +204,7 @@ module.exports = __webpack_require__(12);
 var svg = __webpack_require__(0),
     colors = __webpack_require__(1),
     gradients = __webpack_require__(2),
-    sequenceEditor = __webpack_require__(13).allocate(),
+    sequenceEditor = __webpack_require__(11).allocate(),
     sequenceSerializer = __webpack_require__(3),
     digitProperties = {
     "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
@@ -306,7 +304,7 @@ window.addEventListener("click", function (e) {
 });
 
 /***/ }),
-/* 13 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
