@@ -252,7 +252,7 @@ var svg = __webpack_require__(0),
         height: "100%",
         viewBox: "-1 -1 2 2",
         style: "background-color: " + colors.background + ";"
-    }, [gradients()].concat(createDigit(-0.4, 0), createDigit(-0.15, 1), svg.text(Object.assign({ x: 0, y: -0.52 }, digitProperties), ":"), createDigit(0.15, 2), createDigit(0.4, 3)).concat(createButton({ id: "remove", cx: -0.4, x: -0.4, y: 0.75, label: "⎌" }), createButton({ id: "add", cx: 0, x: 0, y: 0.77, label: "+" }), createButton({ id: "run", cx: 0.4, x: 0.42, y: 0.77, label: "▶" }), svg.g({ id: "list" }))));
+    }, [gradients()].concat(createDigit(-0.4, 0), createDigit(-0.15, 1), svg.text(Object.assign({ x: 0, y: -0.52 }, digitProperties), ":"), createDigit(0.15, 2), createDigit(0.4, 3)).concat(createButton({ id: "remove", cx: -0.4, x: -0.4, y: 0.75, label: "-" }), createButton({ id: "add", cx: 0, x: 0, y: 0.77, label: "+" }), createButton({ id: "run", cx: 0.4, x: 0.42, y: 0.77, label: "▶" }), svg.g({ id: "list" }))));
     sequenceEditor.set(sequenceSerializer.read(location.hash.substr(1)));
     sequenceEditor.on(refresh);
 },
@@ -329,10 +329,7 @@ var tickFormatter = __webpack_require__(4),
     _notify(editor);
 },
     _inc = function _inc(editor, sec) {
-    var top = editor.sequence.pop() + sec * 1000;
-    if (top < 0) {
-        top = 0;
-    }
+    var top = Math.min(Math.max(editor.sequence.pop() + sec * 1000, 0), 5999000);
     editor.sequence.push(top);
     _notify(editor);
 },
