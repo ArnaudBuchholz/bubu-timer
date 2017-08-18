@@ -20,10 +20,7 @@ const
     },
 
     _inc = (editor, sec) => {
-        let top = editor.sequence.pop() + sec * 1000;
-        if (top < 0) {
-            top = 0;
-        }
+        let top = Math.min(Math.max(editor.sequence.pop() + sec * 1000, 0), 5999000);
         editor.sequence.push(top);
         _notify(editor);
     },
