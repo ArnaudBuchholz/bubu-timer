@@ -113,6 +113,14 @@ describe("sequence-editor", () => {
             expected: ["00:00"]
         }], [0]);
 
+        playScenario("scenario 4 (never over 99:59)", [{
+            inc: 3600,
+            expected: ["60:00"]
+        }, {
+            inc: 3600,
+            expected: ["99:59"]
+        }], [5999000]);
+
     });
 
     describe("adding duration", () => {
