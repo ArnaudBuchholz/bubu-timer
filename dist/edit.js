@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -70,12 +70,15 @@
 "use strict";
 
 
-var _tag = function _tag(tagName, properties, children) {
+var _tag = function _tag(tagName) {
+    var properties = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var children = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
     var element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
     Object.keys(properties).forEach(function (name) {
         element.setAttribute(name, properties[name]);
     });
-    [].concat(children || []).map(function (def) {
+    [].concat(children).map(function (def) {
         return typeof def === "string" ? document.createTextNode(def) : def;
     }).forEach(function (node) {
         return element.appendChild(node);
@@ -122,6 +125,24 @@ module.exports = {
 "use strict";
 
 
+if (!Object.assign) {
+    Object.assign = function (target, properties) {
+        Object.keys(properties).forEach(function (propertyName) {
+            target[propertyName] = properties[propertyName];
+        });
+        return target;
+    };
+}
+
+module.exports = true;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var noop = function noop() {};
 
 module.exports = function (setup) {
@@ -129,13 +150,14 @@ module.exports = function (setup) {
     window.addEventListener("load", function () {
         var touchTarget = void 0;
         var mapping = setup(),
+            defaultHandler = mapping["undefined"] || noop,
             click = function click(target) {
             var id = void 0;
             while (!id && target) {
                 id = target.id;
                 target = target.parentNode;
             }
-            (mapping[id] || noop)();
+            (mapping[id] || defaultHandler)();
         };
 
         window.addEventListener("click", function (e) {
@@ -157,7 +179,41 @@ module.exports = function (setup) {
 };
 
 /***/ }),
-/* 3 */
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _get = function _get(id) {
+    return document.getElementById(id);
+},
+    _clear = function _clear(id) {
+    var node = _get(id);
+    var child = node.firstChild,
+        next = void 0;
+    while (child) {
+        next = child.nextSibling;
+        node.removeChild(child);
+        child = next;
+    }
+    return node;
+},
+    _setText = function _setText(id, text) {
+    var node = _clear(id);
+    node.appendChild(document.createTextNode(text));
+    return node;
+};
+
+module.exports = {
+
+    clear: _clear,
+    setText: _setText
+
+};
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -171,7 +227,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -194,7 +250,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -223,18 +279,18 @@ module.exports = function (tick) {
 };
 
 /***/ }),
-/* 6 */,
-/* 7 */,
 /* 8 */,
 /* 9 */,
-/* 10 */
+/* 10 */,
+/* 11 */,
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(11);
+module.exports = __webpack_require__(13);
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -242,12 +298,15 @@ module.exports = __webpack_require__(11);
 
 /*global location*/
 
-var browser = __webpack_require__(2),
+__webpack_require__(2);
+
+var browser = __webpack_require__(3),
+    dom = __webpack_require__(4),
     svg = __webpack_require__(0),
     colors = __webpack_require__(1),
-    gradients = __webpack_require__(3),
-    sequenceEditor = __webpack_require__(12).allocate(),
-    sequenceSerializer = __webpack_require__(4),
+    gradients = __webpack_require__(5),
+    sequenceEditor = __webpack_require__(14).allocate(),
+    sequenceSerializer = __webpack_require__(6),
     digitProperties = {
     "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
     fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
@@ -271,11 +330,11 @@ var browser = __webpack_require__(2),
 },
     refresh = function refresh(sequence /*, lengthChanged*/) {
     var current = sequence[sequence.length - 1],
-        list = document.getElementById("list");
+        list = void 0;
     [0, 1, 3, 4].forEach(function (pos, digit) {
-        document.getElementById("dig" + digit).innerHTML = current.substr(pos, 1);
+        dom.setText("dig" + digit, current.substr(pos, 1));
     });
-    list.innerHTML = ""; // clean
+    list = dom.clear("list");
     sequence.forEach(function (time, index) {
         list.appendChild(svg.text({
             x: -0.5 + 0.45 * (index % 4),
@@ -336,13 +395,13 @@ var browser = __webpack_require__(2),
 browser(setup);
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var tickFormatter = __webpack_require__(5),
+var tickFormatter = __webpack_require__(7),
     _allocate = function _allocate() {
     return {
         callback: function callback() {},
