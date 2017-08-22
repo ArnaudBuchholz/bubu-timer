@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -122,6 +122,47 @@ module.exports = {
 "use strict";
 
 
+var noop = function noop() {};
+
+module.exports = function (setup) {
+
+    window.addEventListener("load", function () {
+        var touchTarget = void 0;
+        var mapping = setup(),
+            click = function click(target) {
+            var id = void 0;
+            while (!id && target) {
+                id = target.id;
+                target = target.parentNode;
+            }
+            (mapping[id] || noop)();
+        };
+
+        window.addEventListener("click", function (e) {
+            return click(e.target);
+        }, false);
+        window.addEventListener("touchstart", function (e) {
+            touchTarget = e.target;
+        }, false);
+        window.addEventListener("touchmove", function () {
+            touchTarget = null;
+        }, false);
+        window.addEventListener("touchend", function () {
+            if (null !== touchTarget) {
+                click(touchTarget);
+                touchTarget = null;
+            }
+        }, false);
+    });
+};
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var svg = __webpack_require__(0),
     colors = __webpack_require__(1);
 
@@ -130,7 +171,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -153,7 +194,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -182,14 +223,14 @@ module.exports = function (tick) {
 };
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(6);
+module.exports = __webpack_require__(7);
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -201,13 +242,14 @@ var TOTAL_OUTER = 0.98,
     TOTAL_INNER = 0.88,
     STEP_OUTER = 0.83,
     STEP_INNER = 0.73,
+    browser = __webpack_require__(2),
     svg = __webpack_require__(0),
     colors = __webpack_require__(1),
-    gradients = __webpack_require__(2),
-    sequenceSerializer = __webpack_require__(3),
-    tickGenerator = __webpack_require__(7),
-    tickConverter = __webpack_require__(8),
-    tickFormatter = __webpack_require__(4),
+    gradients = __webpack_require__(3),
+    sequenceSerializer = __webpack_require__(4),
+    tickGenerator = __webpack_require__(8),
+    tickConverter = __webpack_require__(9),
+    tickFormatter = __webpack_require__(5),
 
 
 // alarm1 = new Audio(require("./res/alarm1.mp3")),
@@ -282,7 +324,10 @@ defaultRequestAnimFrame = function defaultRequestAnimFrame(callback) {
         fill: color, stroke: color, "stroke-opacity": 0.2, "stroke-width": 0.01 })];
 },
     setup = function setup() {
-
+    if (0 === sequence.length) {
+        alert("No sequence to play");
+        return {};
+    }
     document.body.appendChild(svg({
         width: "100%",
         height: "100%",
@@ -308,27 +353,18 @@ defaultRequestAnimFrame = function defaultRequestAnimFrame(callback) {
         "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
         fill: colors.text.step,
         stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01 }, "1 / 2")])));
+    ticker.on(onTick);
+    return {
+        "undefined": function undefined() {
+            return ticker.isPaused() ? ticker.resume() : ticker.pause();
+        }
+    };
 };
 
-window.addEventListener("load", function () {
-    if (0 === sequence.length) {
-        alert("No sequence to play");
-    } else {
-        setup();
-        ticker.on(onTick);
-    }
-});
-
-window.addEventListener("click", function () {
-    if (ticker.isPaused()) {
-        ticker.resume();
-    } else {
-        ticker.pause();
-    }
-});
+browser(setup);
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -402,7 +438,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -122,6 +122,47 @@ module.exports = {
 "use strict";
 
 
+var noop = function noop() {};
+
+module.exports = function (setup) {
+
+    window.addEventListener("load", function () {
+        var touchTarget = void 0;
+        var mapping = setup(),
+            click = function click(target) {
+            var id = void 0;
+            while (!id && target) {
+                id = target.id;
+                target = target.parentNode;
+            }
+            (mapping[id] || noop)();
+        };
+
+        window.addEventListener("click", function (e) {
+            return click(e.target);
+        }, false);
+        window.addEventListener("touchstart", function (e) {
+            touchTarget = e.target;
+        }, false);
+        window.addEventListener("touchmove", function () {
+            touchTarget = null;
+        }, false);
+        window.addEventListener("touchend", function () {
+            if (null !== touchTarget) {
+                click(touchTarget);
+                touchTarget = null;
+            }
+        }, false);
+    });
+};
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var svg = __webpack_require__(0),
     colors = __webpack_require__(1);
 
@@ -130,7 +171,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -153,7 +194,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -182,18 +223,18 @@ module.exports = function (tick) {
 };
 
 /***/ }),
-/* 5 */,
 /* 6 */,
 /* 7 */,
 /* 8 */,
-/* 9 */
+/* 9 */,
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(10);
+module.exports = __webpack_require__(11);
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -201,11 +242,12 @@ module.exports = __webpack_require__(10);
 
 /*global location*/
 
-var svg = __webpack_require__(0),
+var browser = __webpack_require__(2),
+    svg = __webpack_require__(0),
     colors = __webpack_require__(1),
-    gradients = __webpack_require__(2),
-    sequenceEditor = __webpack_require__(11).allocate(),
-    sequenceSerializer = __webpack_require__(3),
+    gradients = __webpack_require__(3),
+    sequenceEditor = __webpack_require__(12).allocate(),
+    sequenceSerializer = __webpack_require__(4),
     digitProperties = {
     "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
     fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
@@ -253,64 +295,54 @@ var svg = __webpack_require__(0),
     }, [gradients()].concat(createDigit(-0.4, 0), createDigit(-0.15, 1), svg.text(Object.assign({ x: 0, y: -0.52 }, digitProperties), ":"), createDigit(0.15, 2), createDigit(0.4, 3)).concat(createButton({ id: "remove", cx: -0.4, x: -0.4, y: 0.75, label: "-" }), createButton({ id: "add", cx: 0, x: 0, y: 0.77, label: "+" }), createButton({ id: "run", cx: 0.4, x: 0.42, y: 0.77, label: "▶" }), svg.g({ id: "list" }))));
     sequenceEditor.set(sequenceSerializer.read(location.hash.substr(1)));
     sequenceEditor.on(refresh);
-},
-    noop = function noop() {},
-    mapping = {
-    inc0: function inc0() {
-        return sequenceEditor.inc(600);
-    },
-    dec0: function dec0() {
-        return sequenceEditor.dec(600);
-    },
-    inc1: function inc1() {
-        return sequenceEditor.inc(60);
-    },
-    dec1: function dec1() {
-        return sequenceEditor.dec(60);
-    },
-    inc2: function inc2() {
-        return sequenceEditor.inc(10);
-    },
-    dec2: function dec2() {
-        return sequenceEditor.dec(10);
-    },
-    inc3: function inc3() {
-        return sequenceEditor.inc(1);
-    },
-    dec3: function dec3() {
-        return sequenceEditor.dec(1);
-    },
-    add: function add() {
-        return sequenceEditor.get().length < 16 ? sequenceEditor.add() : 0;
-    },
-    remove: function remove() {
-        return sequenceEditor.remove();
-    },
-    run: function run() {
-        window.location = "run.html?" + encodedSequence();
-    }
+
+    return {
+        inc0: function inc0() {
+            return sequenceEditor.inc(600);
+        },
+        dec0: function dec0() {
+            return sequenceEditor.dec(600);
+        },
+        inc1: function inc1() {
+            return sequenceEditor.inc(60);
+        },
+        dec1: function dec1() {
+            return sequenceEditor.dec(60);
+        },
+        inc2: function inc2() {
+            return sequenceEditor.inc(10);
+        },
+        dec2: function dec2() {
+            return sequenceEditor.dec(10);
+        },
+        inc3: function inc3() {
+            return sequenceEditor.inc(1);
+        },
+        dec3: function dec3() {
+            return sequenceEditor.dec(1);
+        },
+        add: function add() {
+            return sequenceEditor.get().length < 16 ? sequenceEditor.add() : 0;
+        },
+        remove: function remove() {
+            return sequenceEditor.remove();
+        },
+        run: function run() {
+            window.location = "run.html?" + encodedSequence();
+        }
+    };
 };
 
-window.addEventListener("load", setup);
-
-window.addEventListener("click", function (e) {
-    var target = e.target,
-        id = void 0;
-    while (!id && target) {
-        id = target.id;
-        target = target.parentNode;
-    }
-    (mapping[id] || noop)();
-});
+browser(setup);
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var tickFormatter = __webpack_require__(4),
+var tickFormatter = __webpack_require__(5),
     _allocate = function _allocate() {
     return {
         callback: function callback() {},

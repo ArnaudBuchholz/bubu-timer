@@ -9,6 +9,7 @@ const
     TOTAL_INNER = 0.88,
     STEP_OUTER  = 0.83,
     STEP_INNER  = 0.73,
+    browser = require("./browser"),
     svg = require("./svg"),
     colors = require("./colors"),
     gradients = require("./gradients"),
@@ -103,7 +104,10 @@ const
     },
 
     setup = () => {
-
+        if (0 === sequence.length) {
+            alert("No sequence to play");
+            return {};
+        }
         document.body.appendChild(svg({
             width: "100%",
             height: "100%",
@@ -137,23 +141,10 @@ const
                     stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01}, "1 / 2")
             ])
         ));
-    }
-;
-
-window.addEventListener("load", () => {
-    if (0 === sequence.length) {
-        alert("No sequence to play");
-    } else {
-        setup();
         ticker.on(onTick);
-    }
-});
+        return {
+            "undefined": () => ticker.isPaused() ? ticker.resume() : ticker.pause()
+        };
+    };
 
-window.addEventListener("click", () => {
-    if (ticker.isPaused()) {
-        ticker.resume();
-    } else {
-        ticker.pause();
-    }
-});
-
+browser(setup);
