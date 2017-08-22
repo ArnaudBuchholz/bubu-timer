@@ -2,6 +2,8 @@
 
 /*eslint-disable no-alert*/
 
+require("./compatibility");
+
 const
     TOTAL_OUTER = 0.98,
     TOTAL_INNER = 0.88,
