@@ -3,6 +3,7 @@
 /*global location*/
 
 const
+    browser = require("./browser"),
     svg = require("./svg"),
     colors = require("./colors"),
     gradients = require("./gradients"),
@@ -75,34 +76,22 @@ const
         ));
         sequenceEditor.set(sequenceSerializer.read(location.hash.substr(1)));
         sequenceEditor.on(refresh);
-    },
 
-    noop = () => {},
-
-    mapping = {
-        inc0: () => sequenceEditor.inc(600),
-        dec0: () => sequenceEditor.dec(600),
-        inc1: () => sequenceEditor.inc(60),
-        dec1: () => sequenceEditor.dec(60),
-        inc2: () => sequenceEditor.inc(10),
-        dec2: () => sequenceEditor.dec(10),
-        inc3: () => sequenceEditor.inc(1),
-        dec3: () => sequenceEditor.dec(1),
-        add: () => sequenceEditor.get().length < 16 ? sequenceEditor.add() : 0,
-        remove: () => sequenceEditor.remove(),
-        run: () => {
-            window.location = "run.html?" + encodedSequence();
-        }
+        return {
+            inc0: () => sequenceEditor.inc(600),
+            dec0: () => sequenceEditor.dec(600),
+            inc1: () => sequenceEditor.inc(60),
+            dec1: () => sequenceEditor.dec(60),
+            inc2: () => sequenceEditor.inc(10),
+            dec2: () => sequenceEditor.dec(10),
+            inc3: () => sequenceEditor.inc(1),
+            dec3: () => sequenceEditor.dec(1),
+            add: () => sequenceEditor.get().length < 16 ? sequenceEditor.add() : 0,
+            remove: () => sequenceEditor.remove(),
+            run: () => {
+                window.location = "run.html?" + encodedSequence();
+            }
+        };
     };
 
-window.addEventListener("load", setup);
-
-window.addEventListener("click", (e) => {
-    let target = e.target,
-        id;
-    while (!id && target) {
-        id = target.id;
-        target = target.parentNode;
-    }
-    (mapping[id] || noop)();
-});
+browser(setup);
