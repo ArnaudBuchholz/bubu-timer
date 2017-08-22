@@ -2,6 +2,8 @@
 
 /*global location*/
 
+require("./compatibility");
+
 const
     svg = require("./svg"),
     colors = require("./colors"),
