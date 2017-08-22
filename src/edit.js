@@ -6,6 +6,7 @@ require("./compatibility");
 
 const
     browser = require("./browser"),
+    dom = require("./dom"),
     svg = require("./svg"),
     colors = require("./colors"),
     gradients = require("./gradients"),
@@ -39,11 +40,11 @@ const
 
     refresh = (sequence/*, lengthChanged*/) => {
         let current = sequence[sequence.length - 1],
-            list = document.getElementById("list");
+            list;
         [0, 1, 3, 4].forEach((pos, digit) => {
-            document.getElementById(`dig${digit}`).innerHTML = current.substr(pos, 1);
+            dom.setText(`dig${digit}`, current.substr(pos, 1));
         });
-        list.innerHTML = ""; // clean
+        list = dom.clear("list");
         sequence.forEach((time, index) => {
             list.appendChild(svg.text({
                 x: -0.5 + 0.45 * (index % 4),
