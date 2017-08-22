@@ -1,12 +1,12 @@
 "use strict";
 
 const
-    _tag = function (tagName, properties, children) {
+    _tag = function (tagName, properties = {}, children = []) {
         let element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
         Object.keys(properties).forEach(name => {
             element.setAttribute(name, properties[name]);
         });
-        [].concat(children || [])
+        [].concat(children)
             .map(def => typeof def === "string" ? document.createTextNode(def) : def)
             .forEach(node => element.appendChild(node));
         return element;
