@@ -10,6 +10,7 @@ const
     STEP_OUTER  = 0.83,
     STEP_INNER  = 0.73,
     browser = require("./browser"),
+    dom = require("./dom"),
     svg = require("./svg"),
     colors = require("./colors"),
     gradients = require("./gradients"),
@@ -75,18 +76,18 @@ const
             step = 1 - convertedTick.remaining / currentDuration,
             formattedRemaining = tickFormatter(convertedTick.remaining);
 
-        document.getElementById("time").innerHTML = formattedRemaining.time;
-        document.getElementById("ms").innerHTML = `.${formattedRemaining.ms}`;
+        dom.setText("time", formattedRemaining.time);
+        dom.setText("ms", `.${formattedRemaining.ms}`);
 
         if (convertedTick.step < sequence.length) {
             document.getElementById("total").setAttribute("d", getCirclePath(total, TOTAL_OUTER, TOTAL_INNER));
             document.getElementById("step").setAttribute("d", getCirclePath(step, STEP_OUTER, STEP_INNER));
-            document.getElementById("stepOn").innerHTML = `${convertedTick.step + 1} / ${sequence.length}`;
+            dom.setText("stepOn", `${convertedTick.step + 1} / ${sequence.length}`);
             requestAnimFrame(ticker.tick.bind(ticker));
         } else {
             document.getElementById("total").setAttribute("d", getCirclePath(0, TOTAL_OUTER, TOTAL_INNER));
             document.getElementById("step").setAttribute("d", getCirclePath(0, STEP_OUTER, STEP_INNER));
-            document.getElementById("stepOn").innerHTML = "done.";
+            dom.setText("stepOn", "done.");
         }
     },
 
