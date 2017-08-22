@@ -9,13 +9,14 @@ module.exports = setup => {
             touchTarget;
         const
             mapping = setup(),
+            defaultHandler = mapping["undefined"] || noop,
             click = target => {
                 let id;
                 while (!id && target) {
                     id = target.id;
                     target = target.parentNode;
                 }
-                (mapping[id] || noop)();
+                (mapping[id] || defaultHandler)();
             };
 
         window.addEventListener("click", e => click(e.target), false);
