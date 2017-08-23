@@ -150,31 +150,37 @@ __webpack_require__(4);
 module.exports = function (setup) {
 
     window.addEventListener("load", function () {
-        var touchTarget = void 0;
+        var touchEvent = void 0;
         var mapping = setup(),
-            defaultHandler = mapping["undefined"] || noop,
-            click = function click(target) {
-            var id = void 0;
-            while (!id && target) {
-                id = target.id;
-                target = target.parentNode;
+            click = function click(e) {
+            var x = e.clientX,
+                y = e.clientY;
+            if (Object.keys(mapping).every(function (id) {
+                if ("undefined" === id) {
+                    return true; // skip
+                }
+                var rect = document.getElementById(id).getBoundingClientRect();
+                if (!(x < rect.left || x > rect.right || y < rect.top || y > rect.bottom)) {
+                    mapping[id]();
+                    return false;
+                }
+                return true;
+            })) {
+                (mapping["undefined"] || noop)();
             }
-            (mapping[id] || defaultHandler)();
         };
 
-        window.addEventListener("click", function (e) {
-            return click(e.target);
-        }, true);
+        window.addEventListener("click", click, true);
         window.addEventListener("touchstart", function (e) {
-            touchTarget = e.target;
+            touchEvent = e;
         }, false);
         window.addEventListener("touchmove", function () {
-            touchTarget = null;
+            touchEvent = null;
         }, false);
         window.addEventListener("touchend", function () {
-            if (null !== touchTarget) {
-                click(touchTarget);
-                touchTarget = null;
+            if (null !== touchEvent) {
+                click(touchEvent);
+                touchEvent = null;
             }
         }, false);
     });
@@ -220,7 +226,7 @@ exports = module.exports = __webpack_require__(6)(undefined);
 
 
 // module
-exports.push([module.i, "html {\n    width: 100%;\n    height: 100%;\n    margin: 0;\n    padding: 0;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n    margin: 0;\n    padding: 0;\n}\n\nsvg {\n    cursor: pointer;\n    /*pointer-events: none;*/\n}\n", ""]);
+exports.push([module.i, "html {\n    width: 100%;\n    height: 100%;\n    margin: 0;\n    padding: 0;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n    margin: 0;\n    padding: 0;\n    -webkit-user-select: none;  /* Chrome all / Safari all */\n    -moz-user-select: none;     /* Firefox all */\n    -ms-user-select: none;      /* IE 10+ */\n    user-select: none;          /* Likely future */\n}\n\nsvg {\n    cursor: pointer;\n    pointer-events: none;\n}\n", ""]);
 
 // exports
 
@@ -894,19 +900,23 @@ var browser = __webpack_require__(3),
     "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
     fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
 },
-    createDigit = function createDigit(x, baseId) {
-    return [svg.rect({ x: x - 0.1, y: -0.8, width: 0.2, height: 0.4,
-        fill: colors.circle.background, stroke: "url(#outerBorder)", "stroke-width": 0.01 }), svg.text(Object.assign({ id: "inc" + baseId, x: x, y: -0.8 }, digitProperties), "⏶"), svg.text(Object.assign({ id: "dig" + baseId, x: x, y: -0.52 }, digitProperties), ""), svg.text(Object.assign({ id: "dec" + baseId, x: x, y: -0.26 }, digitProperties), "⏷")];
-},
     createButton = function createButton(_ref) {
     var id = _ref.id,
         cx = _ref.cx,
         x = _ref.x,
         y = _ref.y,
-        label = _ref.label;
-    return [svg.g({ id: id }, [svg.circle({ r: 0.15, cx: cx, cy: 0.7,
+        label = _ref.label,
+        _ref$r = _ref.r,
+        r = _ref$r === undefined ? 0.15 : _ref$r,
+        _ref$cy = _ref.cy,
+        cy = _ref$cy === undefined ? 0.7 : _ref$cy;
+    return [svg.circle({ id: id, r: r, cx: cx, cy: cy,
         fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01 }), svg.text({ x: x, y: y, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
-        fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, label)])];
+        fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, label)];
+},
+    createDigit = function createDigit(x, baseId) {
+    return [svg.rect({ x: x - 0.1, y: -0.8, width: 0.2, height: 0.4,
+        fill: colors.circle.background, stroke: "url(#outerBorder)", "stroke-width": 0.01 }), svg.text(Object.assign({ id: "dig" + baseId, x: x, y: -0.52 }, digitProperties), "")].concat(createButton({ id: "inc" + baseId, cx: x, x: x, y: -0.82, r: 0.08, cy: -0.89, label: "+" }), createButton({ id: "dec" + baseId, cx: x, x: x, y: -0.26, r: 0.08, cy: -0.31, label: "-" }));
 },
     encodedSequence = function encodedSequence() {
     return sequenceSerializer.write(sequenceEditor.get());
