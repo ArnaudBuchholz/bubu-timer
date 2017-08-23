@@ -8,30 +8,40 @@ module.exports = setup => {
 
     window.addEventListener("load", () => {
         let
-            touchTarget;
+            touchEvent;
         const
             mapping = setup(),
-            defaultHandler = mapping["undefined"] || noop,
-            click = target => {
-                let id;
-                while (!id && target) {
-                    id = target.id;
-                    target = target.parentNode;
+            click = e => {
+                let
+                    x = e.clientX,
+                    y = e.clientY;
+                if (Object.keys(mapping).every(id => {
+                    if ("undefined" === id) {
+                        return true; // skip
+                    }
+                    const rect = document.getElementById(id).getBoundingClientRect();
+                    if (!(x < rect.left || x > rect.right || y < rect.top || y > rect.bottom)) {
+                        mapping[id]();
+                        return false;
+                    }
+                    return true;
+
+                })) {
+                    (mapping["undefined"] || noop)();
                 }
-                (mapping[id] || defaultHandler)();
             };
 
-        window.addEventListener("click", e => click(e.target), true);
+        window.addEventListener("click", click, true);
         window.addEventListener("touchstart", e => {
-            touchTarget = e.target;
+            touchEvent = e;
         }, false);
         window.addEventListener("touchmove", () => {
-            touchTarget = null;
+            touchEvent = null;
         }, false);
         window.addEventListener("touchend", () => {
-            if (null !== touchTarget) {
-                click(touchTarget);
-                touchTarget = null;
+            if (null !== touchEvent) {
+                click(touchEvent);
+                touchEvent = null;
             }
         }, false);
     });
