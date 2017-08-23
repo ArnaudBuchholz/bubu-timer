@@ -2,6 +2,8 @@
 
 const noop = () => {};
 
+require("./res/stylesheet.css");
+
 module.exports = setup => {
 
     window.addEventListener("load", () => {
@@ -19,7 +21,7 @@ module.exports = setup => {
                 (mapping[id] || defaultHandler)();
             };
 
-        window.addEventListener("click", e => click(e.target), false);
+        window.addEventListener("click", e => click(e.target), true);
         window.addEventListener("touchstart", e => {
             touchTarget = e.target;
         }, false);
