@@ -18,23 +18,22 @@ const
         fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
     },
 
+    createButton = ({id, cx, x, y, label, r = 0.15, cy = 0.7}) => [
+        svg.circle({id: id, r: r, cx: cx, cy: cy,
+            fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01}),
+        svg.text({x: x, y: y, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
+            fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001},
+        label)
+    ],
+
     createDigit = (x, baseId) => [
         svg.rect({x: x - 0.1, y: -0.8, width: 0.2, height: 0.4,
             fill: colors.circle.background, stroke: "url(#outerBorder)", "stroke-width": 0.01}),
-        svg.text(Object.assign({id: `inc${baseId}`, x: x, y: -0.8}, digitProperties), "⏶"),
-        svg.text(Object.assign({id: `dig${baseId}`, x: x, y: -0.52}, digitProperties), ""),
-        svg.text(Object.assign({id: `dec${baseId}`, x: x, y: -0.26}, digitProperties), "⏷")
-    ],
-
-    createButton = ({id, cx, x, y, label}) => [
-        svg.g({id: id}, [
-            svg.circle({r: 0.15, cx: cx, cy: 0.7,
-                fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01}),
-            svg.text({x: x, y: y, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
-                fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001},
-            label)
-        ])
-    ],
+        svg.text(Object.assign({id: `dig${baseId}`, x: x, y: -0.52}, digitProperties), "")
+    ].concat(
+        createButton({id: `inc${baseId}`, cx: x, x: x, y: -0.82, r: 0.08, cy: -0.89, label: "+"}),
+        createButton({id: `dec${baseId}`, cx: x, x: x, y: -0.26, r: 0.08, cy: -0.31, label: "-"})
+    ),
 
     encodedSequence = () => sequenceSerializer.write(sequenceEditor.get()),
 
