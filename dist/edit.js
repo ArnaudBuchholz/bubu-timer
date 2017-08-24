@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 17);
+/******/ 	return __webpack_require__(__webpack_require__.s = 19);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -881,14 +881,16 @@ module.exports = function (tick) {
 /* 14 */,
 /* 15 */,
 /* 16 */,
-/* 17 */
+/* 17 */,
+/* 18 */,
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(18);
+module.exports = __webpack_require__(20);
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -903,7 +905,7 @@ var browser = __webpack_require__(3),
     svg = __webpack_require__(0),
     colors = __webpack_require__(1),
     gradients = __webpack_require__(10),
-    sequenceEditor = __webpack_require__(19).allocate(),
+    sequenceEditor = __webpack_require__(21).allocate(),
     sequenceSerializer = __webpack_require__(11),
     digitProperties = {
     "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
@@ -997,7 +999,7 @@ var browser = __webpack_require__(3),
 browser(setup);
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
