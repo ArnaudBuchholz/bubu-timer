@@ -150,11 +150,17 @@ __webpack_require__(4);
 module.exports = function (setup) {
 
     window.addEventListener("load", function () {
-        var touchEvent = void 0;
+        var touchDisabled = true,
+            touchEvent = void 0;
         var mapping = setup(),
+            coords = function coords(e) {
+            return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+        },
             click = function click(e) {
-            var x = e.clientX,
-                y = e.clientY;
+            var _coords = coords(e),
+                x = _coords.x,
+                y = _coords.y;
+
             if (Object.keys(mapping).every(function (id) {
                 if ("undefined" === id) {
                     return true; // skip
@@ -170,8 +176,11 @@ module.exports = function (setup) {
             }
         };
 
-        window.addEventListener("click", click, true);
+        window.addEventListener("click", function (e) {
+            return touchDisabled ? click(e) : 0;
+        }, true);
         window.addEventListener("touchstart", function (e) {
+            touchDisabled = false;
             touchEvent = e;
         }, false);
         window.addEventListener("touchmove", function () {

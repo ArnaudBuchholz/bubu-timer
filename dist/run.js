@@ -150,11 +150,17 @@ __webpack_require__(4);
 module.exports = function (setup) {
 
     window.addEventListener("load", function () {
-        var touchEvent = void 0;
+        var touchDisabled = true,
+            touchEvent = void 0;
         var mapping = setup(),
+            coords = function coords(e) {
+            return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+        },
             click = function click(e) {
-            var x = e.clientX,
-                y = e.clientY;
+            var _coords = coords(e),
+                x = _coords.x,
+                y = _coords.y;
+
             if (Object.keys(mapping).every(function (id) {
                 if ("undefined" === id) {
                     return true; // skip
@@ -170,8 +176,11 @@ module.exports = function (setup) {
             }
         };
 
-        window.addEventListener("click", click, true);
+        window.addEventListener("click", function (e) {
+            return touchDisabled ? click(e) : 0;
+        }, true);
         window.addEventListener("touchstart", function (e) {
+            touchDisabled = false;
             touchEvent = e;
         }, false);
         window.addEventListener("touchmove", function () {
@@ -937,13 +946,36 @@ defaultRequestAnimFrame = function defaultRequestAnimFrame(callback) {
     path.push("L 0 -" + outerRadius);
     return path.join(" ");
 },
+    pulse = function pulse() {
+    var circle = document.getElementById("pulse"),
+        updates = [0.1, 0.08, 0.06, 0.03, 0],
+        update = function update() {
+        var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+        circle.setAttribute("r", updates[index]);
+        if (index < updates.length) {
+            setTimeout(function () {
+                update(index + 1);
+            }, 100);
+        }
+    };
+    update();
+},
     onTick = function onTick(tick) {
 
     var convertedTick = tickConverter(tick.elapsed, sequence),
         currentDuration = sequence[convertedTick.step % sequence.length],
         total = tick.elapsed / sequenceTotal % 1,
         step = 1 - convertedTick.remaining / currentDuration,
-        formattedRemaining = tickFormatter(convertedTick.remaining);
+        formattedRemaining = tickFormatter(convertedTick.remaining),
+        second = Math.floor(tick.elapsed / 1000);
+
+    if (onTick.lastSecond !== second) {
+        onTick.lastSecond = second;
+        if (convertedTick.remaining <= 5000) {
+            pulse();
+        }
+    }
 
     dom.setText("time", formattedRemaining.time);
     dom.setText("ms", "." + formattedRemaining.ms);
@@ -1000,7 +1032,7 @@ defaultRequestAnimFrame = function defaultRequestAnimFrame(callback) {
         stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, ".123"), svg.text({ id: "stepOn",
         "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
         fill: colors.text.step,
-        stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01 }, "1 / 2")])));
+        stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01 }, "1 / 2"), svg.circle({ id: "pulse", cx: 0, cy: 0.85, r: 0, "stroke-width": 0, fill: "red", opacity: 0.5 })])));
     ticker.on(onTick);
     return {
         "undefined": function undefined() {
