@@ -2,6 +2,4 @@
 A configurable app-like timer
 
 # Resources
-Sounds:
-* [Alarm1.mp3](https://www.freesound.org/people/kwahmah_02/sounds/250629/)
-* [Alarm2.mp3](https://www.freesound.org/people/kwahmah_02/sounds/244932/)
+Sounds extracted from [Double-Muyu-Fischtrommel-2-Solfeggios-285-528Hz.mp3](https://freesound.org/people/the_very_Real_Horst/sounds/207234/)
