@@ -18,6 +18,8 @@ const
     tickGenerator = require("./tick-generator"),
     tickConverter = require("./tick-converter"),
     tickFormatter = require("./tick-formatter"),
+    NoSleep = require("nosleep.js"),
+    noSleep = new NoSleep(),
 
     tickSound = new Audio(require("./res/tick.mp3")),
     doneSound = new Audio(require("./res/end.mp3")),
@@ -114,6 +116,7 @@ const
             document.getElementById("step").setAttribute("d", getCirclePath(0, STEP_OUTER, STEP_INNER));
             dom.setText("stepOn", "done.");
             doneSound.play();
+            noSleep.disable();
         }
     },
 
@@ -171,7 +174,15 @@ const
         ));
         ticker.on(onTick);
         return {
-            "undefined": () => ticker.isPaused() ? ticker.resume() : ticker.pause()
+            "undefined": () => {
+                if (ticker.isPaused()) {
+                    noSleep.enable();
+                    ticker.resume();
+                } else {
+                    ticker.pause();
+                    noSleep.disable();
+                }
+            }
         };
     };
 
