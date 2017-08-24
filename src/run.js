@@ -67,14 +67,37 @@ const
         return path.join(" ");
     },
 
+    pulse = () => {
+        const
+            circle = document.getElementById("pulse"),
+            updates = [0.1, 0.08, 0.06, 0.03, 0],
+            update = (index = 0) => {
+                circle.setAttribute("r", updates[index]);
+                if (index < updates.length) {
+                    setTimeout(() => {
+                        update(index + 1);
+                    }, 100);
+                }
+            };
+        update();
+    },
+
     onTick = tick => {
 
-        let
+        const
             convertedTick = tickConverter(tick.elapsed, sequence),
             currentDuration = sequence[convertedTick.step % sequence.length],
             total = tick.elapsed / sequenceTotal % 1,
             step = 1 - convertedTick.remaining / currentDuration,
-            formattedRemaining = tickFormatter(convertedTick.remaining);
+            formattedRemaining = tickFormatter(convertedTick.remaining),
+            second = Math.floor(tick.elapsed / 1000);
+
+        if (onTick.lastSecond !== second) {
+            onTick.lastSecond = second;
+            if (convertedTick.remaining <= 5000) {
+                pulse();
+            }
+        }
 
         dom.setText("time", formattedRemaining.time);
         dom.setText("ms", `.${formattedRemaining.ms}`);
@@ -139,7 +162,8 @@ const
                 svg.text({id: "stepOn",
                     "font-family": "Arial", "font-size": 0.1, x: 0, y: 0.3, "text-anchor": "middle",
                     fill: colors.text.step,
-                    stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01}, "1 / 2")
+                    stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01}, "1 / 2"),
+                svg.circle({id: "pulse", cx: 0, cy: 0.85, r: 0, "stroke-width": 0, fill: "red", opacity: 0.5})
             ])
         ));
         ticker.on(onTick);
