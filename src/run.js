@@ -19,8 +19,8 @@ const
     tickConverter = require("./tick-converter"),
     tickFormatter = require("./tick-formatter"),
 
-    // alarm1 = new Audio(require("./res/alarm1.mp3")),
-    // alarm2 = new Audio(require("./res/alarm2.mp3")),
+    tickSound = new Audio(require("./res/tick.mp3")),
+    doneSound = new Audio(require("./res/end.mp3")),
 
     defaultRequestAnimFrame = callback => setTimeout(callback, 1000 / 60),
 
@@ -73,13 +73,15 @@ const
             updates = [0.1, 0.08, 0.06, 0.03, 0],
             update = (index = 0) => {
                 circle.setAttribute("r", updates[index]);
+                ++index;
                 if (index < updates.length) {
                     setTimeout(() => {
-                        update(index + 1);
+                        update(index);
                     }, 100);
                 }
             };
         update();
+        tickSound.play();
     },
 
     onTick = tick => {
@@ -94,7 +96,7 @@ const
 
         if (onTick.lastSecond !== second) {
             onTick.lastSecond = second;
-            if (convertedTick.remaining <= 5000) {
+            if (convertedTick.remaining <= 5000 && convertedTick.step < sequence.length) {
                 pulse();
             }
         }
@@ -111,6 +113,7 @@ const
             document.getElementById("total").setAttribute("d", getCirclePath(0, TOTAL_OUTER, TOTAL_INNER));
             document.getElementById("step").setAttribute("d", getCirclePath(0, STEP_OUTER, STEP_INNER));
             dom.setText("stepOn", "done.");
+            doneSound.play();
         }
     },
 
