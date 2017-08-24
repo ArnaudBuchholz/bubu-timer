@@ -8,13 +8,15 @@ module.exports = setup => {
 
     window.addEventListener("load", () => {
         let
+            touchDisabled = true,
             touchEvent;
         const
             mapping = setup(),
+            coords = e => e.touches
+                ? {x: e.touches[0].clientX, y: e.touches[0].clientY}
+                : {x: e.clientX, y: e.clientY},
             click = e => {
-                let
-                    x = e.clientX,
-                    y = e.clientY;
+                const {x, y} = coords(e);
                 if (Object.keys(mapping).every(id => {
                     if ("undefined" === id) {
                         return true; // skip
@@ -31,8 +33,9 @@ module.exports = setup => {
                 }
             };
 
-        window.addEventListener("click", click, true);
+        window.addEventListener("click", e => touchDisabled ? click(e) : 0, true);
         window.addEventListener("touchstart", e => {
+            touchDisabled = false;
             touchEvent = e;
         }, false);
         window.addEventListener("touchmove", () => {
