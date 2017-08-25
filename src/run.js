@@ -18,7 +18,7 @@ const
     tickGenerator = require("./tick-generator"),
     tickConverter = require("./tick-converter"),
     tickFormatter = require("./tick-formatter"),
-    NoSleep = require("nosleep.js"),
+    NoSleep = require("nosleep.js/dist/NoSleep.min"),
     noSleep = new NoSleep(),
 
     tickSound = new Audio(require("./res/tick.mp3")),
