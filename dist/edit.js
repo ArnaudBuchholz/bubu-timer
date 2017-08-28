@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 20);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -122,6 +122,122 @@ module.exports = {
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
+module.exports = __webpack_require__(3);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/*global location*/
+
+__webpack_require__(4);
+
+var browser = __webpack_require__(5),
+    dom = __webpack_require__(11),
+    svg = __webpack_require__(0),
+    colors = __webpack_require__(1),
+    gradients = __webpack_require__(12),
+    sequenceEditor = __webpack_require__(13).allocate(),
+    sequenceSerializer = __webpack_require__(15),
+    digitProperties = {
+    "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
+    fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
+},
+    createButton = function createButton(_ref) {
+    var id = _ref.id,
+        cx = _ref.cx,
+        x = _ref.x,
+        y = _ref.y,
+        label = _ref.label,
+        _ref$r = _ref.r,
+        r = _ref$r === undefined ? 0.15 : _ref$r,
+        _ref$cy = _ref.cy,
+        cy = _ref$cy === undefined ? 0.7 : _ref$cy;
+    return [svg.circle({ id: id, r: r, cx: cx, cy: cy,
+        fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01 }), svg.text({ x: x, y: y, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
+        fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, label)];
+},
+    createDigit = function createDigit(x, baseId) {
+    return [svg.rect({ x: x - 0.1, y: -0.8, width: 0.2, height: 0.4,
+        fill: colors.circle.background, stroke: "url(#outerBorder)", "stroke-width": 0.01 }), svg.text(Object.assign({ id: "dig" + baseId, x: x, y: -0.52 }, digitProperties), "")].concat(createButton({ id: "inc" + baseId, cx: x, x: x, y: -0.82, r: 0.08, cy: -0.89, label: "+" }), createButton({ id: "dec" + baseId, cx: x, x: x, y: -0.26, r: 0.08, cy: -0.31, label: "-" }));
+},
+    encodedSequence = function encodedSequence() {
+    return sequenceSerializer.write(sequenceEditor.get());
+},
+    refresh = function refresh(sequence /*, lengthChanged*/) {
+    var current = sequence[sequence.length - 1],
+        list = void 0;
+    [0, 1, 3, 4].forEach(function (pos, digit) {
+        dom.setText("dig" + digit, current.substr(pos, 1));
+    });
+    list = dom.clear("list");
+    sequence.forEach(function (time, index) {
+        list.appendChild(svg.text({
+            x: -0.5 + 0.45 * (index % 4),
+            y: 0.15 * Math.floor(index / 4),
+            "font-family": "Arial", "font-size": 0.15, "text-anchor": "end",
+            fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
+        }, time));
+    });
+    location.hash = encodedSequence();
+},
+    setup = function setup() {
+    document.body.appendChild(svg({
+        width: "100%",
+        height: "100%",
+        viewBox: "-1 -1 2 2",
+        style: "background-color: " + colors.background + ";"
+    }, [gradients()].concat(createDigit(-0.4, 0), createDigit(-0.15, 1), svg.text(Object.assign({ x: 0, y: -0.52 }, digitProperties), ":"), createDigit(0.15, 2), createDigit(0.4, 3)).concat(createButton({ id: "remove", cx: -0.4, x: -0.4, y: 0.75, label: "-" }), createButton({ id: "add", cx: 0, x: 0, y: 0.77, label: "+" }), createButton({ id: "run", cx: 0.4, x: 0.40, y: 0.77, label: "Go" }), svg.g({ id: "list" }))));
+    sequenceEditor.set(sequenceSerializer.read(location.hash.substr(1)));
+    sequenceEditor.on(refresh);
+
+    return {
+        inc0: function inc0() {
+            return sequenceEditor.inc(600);
+        },
+        dec0: function dec0() {
+            return sequenceEditor.dec(600);
+        },
+        inc1: function inc1() {
+            return sequenceEditor.inc(60);
+        },
+        dec1: function dec1() {
+            return sequenceEditor.dec(60);
+        },
+        inc2: function inc2() {
+            return sequenceEditor.inc(10);
+        },
+        dec2: function dec2() {
+            return sequenceEditor.dec(10);
+        },
+        inc3: function inc3() {
+            return sequenceEditor.inc(1);
+        },
+        dec3: function dec3() {
+            return sequenceEditor.dec(1);
+        },
+        add: function add() {
+            return sequenceEditor.get().length < 16 ? sequenceEditor.add() : 0;
+        },
+        remove: function remove() {
+            return sequenceEditor.remove();
+        },
+        run: function run() {
+            window.location = "run.html?" + encodedSequence();
+        }
+    };
+};
+
+browser(setup);
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
@@ -171,7 +287,7 @@ if ("function" !== typeof video.play) {
 module.exports = true;
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -179,7 +295,7 @@ module.exports = true;
 
 var noop = function noop() {};
 
-__webpack_require__(4);
+__webpack_require__(6);
 
 module.exports = function (setup) {
 
@@ -230,13 +346,13 @@ module.exports = function (setup) {
 };
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(5);
+var content = __webpack_require__(7);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -244,7 +360,7 @@ var transform;
 var options = {}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(7)(content, options);
+var update = __webpack_require__(9)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -261,10 +377,10 @@ if(false) {
 }
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(6)(undefined);
+exports = module.exports = __webpack_require__(8)(undefined);
 // imports
 
 
@@ -275,7 +391,7 @@ exports.push([module.i, "html {\n    width: 100%;\n    height: 100%;\n    margin
 
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports) {
 
 /*
@@ -357,7 +473,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -403,7 +519,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(8);
+var	fixUrls = __webpack_require__(10);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -716,7 +832,7 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports) {
 
 
@@ -811,7 +927,7 @@ module.exports = function (css) {
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -845,7 +961,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -859,188 +975,13 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _read = function _read(string) {
-    return string ? string.split(",").map(function (time) {
-        return 1000 * parseInt(time, 10);
-    }) : [];
-},
-    _write = function _write(sequence) {
-    return sequence.map(function (time) {
-        return Math.floor(time / 1000);
-    }).join(",");
-};
-
-module.exports = {
-    read: _read,
-    write: _write
-};
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _zero = function _zero(x) {
-    var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
-
-    var result = [],
-        max = Math.pow(10, count - 1);
-    while (max > 1 && x < max) {
-        result.push("0");
-        max /= 10;
-    }
-    result.push(x);
-    return result.join("");
-};
-
-module.exports = function (tick) {
-    var ms = _zero(tick % 1000, 3),
-        seconds = (tick - ms) / 1000,
-        s = _zero(seconds % 60),
-        m = _zero((seconds - s) / 60),
-        time = m + ":" + s;
-    return { time: time, ms: ms };
-};
-
-/***/ }),
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */,
-/* 19 */,
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(21);
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*global location*/
-
-__webpack_require__(2);
-
-var browser = __webpack_require__(3),
-    dom = __webpack_require__(9),
-    svg = __webpack_require__(0),
-    colors = __webpack_require__(1),
-    gradients = __webpack_require__(10),
-    sequenceEditor = __webpack_require__(22).allocate(),
-    sequenceSerializer = __webpack_require__(11),
-    digitProperties = {
-    "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
-    fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
-},
-    createButton = function createButton(_ref) {
-    var id = _ref.id,
-        cx = _ref.cx,
-        x = _ref.x,
-        y = _ref.y,
-        label = _ref.label,
-        _ref$r = _ref.r,
-        r = _ref$r === undefined ? 0.15 : _ref$r,
-        _ref$cy = _ref.cy,
-        cy = _ref$cy === undefined ? 0.7 : _ref$cy;
-    return [svg.circle({ id: id, r: r, cx: cx, cy: cy,
-        fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01 }), svg.text({ x: x, y: y, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
-        fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001 }, label)];
-},
-    createDigit = function createDigit(x, baseId) {
-    return [svg.rect({ x: x - 0.1, y: -0.8, width: 0.2, height: 0.4,
-        fill: colors.circle.background, stroke: "url(#outerBorder)", "stroke-width": 0.01 }), svg.text(Object.assign({ id: "dig" + baseId, x: x, y: -0.52 }, digitProperties), "")].concat(createButton({ id: "inc" + baseId, cx: x, x: x, y: -0.82, r: 0.08, cy: -0.89, label: "+" }), createButton({ id: "dec" + baseId, cx: x, x: x, y: -0.26, r: 0.08, cy: -0.31, label: "-" }));
-},
-    encodedSequence = function encodedSequence() {
-    return sequenceSerializer.write(sequenceEditor.get());
-},
-    refresh = function refresh(sequence /*, lengthChanged*/) {
-    var current = sequence[sequence.length - 1],
-        list = void 0;
-    [0, 1, 3, 4].forEach(function (pos, digit) {
-        dom.setText("dig" + digit, current.substr(pos, 1));
-    });
-    list = dom.clear("list");
-    sequence.forEach(function (time, index) {
-        list.appendChild(svg.text({
-            x: -0.5 + 0.45 * (index % 4),
-            y: 0.15 * Math.floor(index / 4),
-            "font-family": "Arial", "font-size": 0.15, "text-anchor": "end",
-            fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
-        }, time));
-    });
-    location.hash = encodedSequence();
-},
-    setup = function setup() {
-    document.body.appendChild(svg({
-        width: "100%",
-        height: "100%",
-        viewBox: "-1 -1 2 2",
-        style: "background-color: " + colors.background + ";"
-    }, [gradients()].concat(createDigit(-0.4, 0), createDigit(-0.15, 1), svg.text(Object.assign({ x: 0, y: -0.52 }, digitProperties), ":"), createDigit(0.15, 2), createDigit(0.4, 3)).concat(createButton({ id: "remove", cx: -0.4, x: -0.4, y: 0.75, label: "-" }), createButton({ id: "add", cx: 0, x: 0, y: 0.77, label: "+" }), createButton({ id: "run", cx: 0.4, x: 0.42, y: 0.77, label: "▶" }), svg.g({ id: "list" }))));
-    sequenceEditor.set(sequenceSerializer.read(location.hash.substr(1)));
-    sequenceEditor.on(refresh);
-
-    return {
-        inc0: function inc0() {
-            return sequenceEditor.inc(600);
-        },
-        dec0: function dec0() {
-            return sequenceEditor.dec(600);
-        },
-        inc1: function inc1() {
-            return sequenceEditor.inc(60);
-        },
-        dec1: function dec1() {
-            return sequenceEditor.dec(60);
-        },
-        inc2: function inc2() {
-            return sequenceEditor.inc(10);
-        },
-        dec2: function dec2() {
-            return sequenceEditor.dec(10);
-        },
-        inc3: function inc3() {
-            return sequenceEditor.inc(1);
-        },
-        dec3: function dec3() {
-            return sequenceEditor.dec(1);
-        },
-        add: function add() {
-            return sequenceEditor.get().length < 16 ? sequenceEditor.add() : 0;
-        },
-        remove: function remove() {
-            return sequenceEditor.remove();
-        },
-        run: function run() {
-            window.location = "run.html?" + encodedSequence();
-        }
-    };
-};
-
-browser(setup);
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var tickFormatter = __webpack_require__(12),
+var tickFormatter = __webpack_require__(14),
     _allocate = function _allocate() {
     return {
         callback: function callback() {},
@@ -1112,6 +1053,58 @@ module.exports = {
         };
     }
 
+};
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _zero = function _zero(x) {
+    var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+
+    var result = [],
+        max = Math.pow(10, count - 1);
+    while (max > 1 && x < max) {
+        result.push("0");
+        max /= 10;
+    }
+    result.push(x);
+    return result.join("");
+};
+
+module.exports = function (tick) {
+    var ms = _zero(tick % 1000, 3),
+        seconds = (tick - ms) / 1000,
+        s = _zero(seconds % 60),
+        m = _zero((seconds - s) / 60),
+        time = m + ":" + s;
+    return { time: time, ms: ms };
+};
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _read = function _read(string) {
+    return string ? string.split(",").map(function (time) {
+        return 1000 * parseInt(time, 10);
+    }) : [];
+},
+    _write = function _write(sequence) {
+    return sequence.map(function (time) {
+        return Math.floor(time / 1000);
+    }).join(",");
+};
+
+module.exports = {
+    read: _read,
+    write: _write
 };
 
 /***/ })
