@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sound test</title>
+    <script>
+
+function onGo () {
+    var sounds = [{
+        label: "blank",
+        from: 0,
+        to: 5
+    }, {
+        label: "tick",
+        from: 5,
+        to: 6
+    }, {
+        label: "end",
+        from: 6,
+        to: 8.5
+    }];
+    var audio = new Audio("../src/res/sounds.mp3");
+    audio.loop = true;
+    audio.addEventListener('timeupdate', function (e) {
+        sounds.forEach(sound => {
+           if (audio.currentTime >= sound.from && audio.currentTime < sound.to) {
+               document.getElementById("current").innerHTML = sound.label;
+           }
+        });
+    });
+    audio.play();
+    audio.currentTime = 5;
+}
+
+    </script>
+</head>
+<body>
+    <input type="button" value="Go!" onclick="onGo()">
+    <span id="current"></span>
+</body>
+</html>
