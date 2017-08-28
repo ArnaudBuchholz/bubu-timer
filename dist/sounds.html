@@ -8,19 +8,23 @@
 // https://www.ibm.com/developerworks/library/wa-ioshtml5/
 function onGo () {
     var sounds = [{
-        label: "blank",
+        label: "meow1",
         from: 0.0,
-        to: 5.0
+        to: 1.1
     }, {
-        label: "tick",
+        label: "meow2",
+        from: 1.3,
+        to: 2.4
+    }, {
+        label: "whine",
+        from: 2.7,
+        to: 3.5
+    }, {
+        label: "purr",
         from: 5.0,
-        to: 6.0
-    }, {
-        label: "end",
-        from: 6.0,
-        to: 8.5
+        to: 10.0
     }];
-    var audio = new Audio("../src/res/sounds.mp3");
+    var audio = document.getElementById("sounds");
     audio.loop = true;
     audio.addEventListener('timeupdate', function (e) {
         document.getElementById("audioProperties").innerHTML = ["currentTime", "ended"]
@@ -35,15 +39,16 @@ function onGo () {
         if (sound) {
             if (audio.currentTime < sound.from) {
                 audio.currentTime = sound.from;
-                current = -1;
             } else if (audio.currentTime >= sound.to) {
                 current = 0;
                 audio.currentTime = 0;
             }
         }
     });
-    var current = 1;
     audio.play();
+    setTimeout(function () {
+        current = 3;
+    }, 1000)
 }
 
     </script>
@@ -51,5 +56,9 @@ function onGo () {
 <body>
     <input type="button" value="Go!" onclick="onGo()">
     <span id="current"></span> : <span id="audioProperties"></span>
+    <audio id="sounds" preload="none">
+        <source src="cat.m4a" type="audio/mpeg" />
+        <source src="cat.ogg" type="audio/ogg" />
+    </audio>
 </body>
 </html>
