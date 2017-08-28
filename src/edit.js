@@ -72,7 +72,7 @@ const
             .concat(
                 createButton({id: "remove", cx: -0.4, x: -0.4, y: 0.75, label: "-"}),
                 createButton({id: "add", cx: 0, x: 0, y: 0.77, label: "+"}),
-                createButton({id: "run", cx: 0.4, x: 0.42, y: 0.77, label: "▶"}),
+                createButton({id: "run", cx: 0.4, x: 0.40, y: 0.77, label: "Go"}),
                 svg.g({id: "list"})
             )
         ));
