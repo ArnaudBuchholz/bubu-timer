@@ -103,6 +103,8 @@ const
             onTick.lastSecond = second;
             if (convertedTick.remaining <= 5000 && convertedTick.step < sequence.length) {
                 pulse();
+            } else {
+                sounds.blank();
             }
         }
 
