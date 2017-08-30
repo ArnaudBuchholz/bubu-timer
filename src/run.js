@@ -18,11 +18,7 @@ const
     tickGenerator = require("./tick-generator"),
     tickConverter = require("./tick-converter"),
     tickFormatter = require("./tick-formatter"),
-    NoSleep = require("nosleep.js/dist/NoSleep.min"),
-    noSleep = new NoSleep(),
-
-    tickSound = new Audio(require("./res/tick.mp3")),
-    doneSound = new Audio(require("./res/end.mp3")),
+    sounds = require("./sounds"),
 
     defaultRequestAnimFrame = callback => setTimeout(callback, 1000 / 60),
 
@@ -83,7 +79,14 @@ const
                 }
             };
         update();
-        tickSound.play();
+        sounds.tick();
+    },
+
+    done = () => {
+        document.getElementById("total").setAttribute("d", getCirclePath(0, TOTAL_OUTER, TOTAL_INNER));
+        document.getElementById("step").setAttribute("d", getCirclePath(0, STEP_OUTER, STEP_INNER));
+        dom.setText("stepOn", "done.");
+        sounds.end();
     },
 
     onTick = tick => {
@@ -112,11 +115,7 @@ const
             dom.setText("stepOn", `${convertedTick.step + 1} / ${sequence.length}`);
             requestAnimFrame(ticker.tick.bind(ticker));
         } else {
-            document.getElementById("total").setAttribute("d", getCirclePath(0, TOTAL_OUTER, TOTAL_INNER));
-            document.getElementById("step").setAttribute("d", getCirclePath(0, STEP_OUTER, STEP_INNER));
-            dom.setText("stepOn", "done.");
-            doneSound.play();
-            noSleep.disable();
+            done();
         }
     },
 
@@ -176,11 +175,11 @@ const
         return {
             "undefined": () => {
                 if (ticker.isPaused()) {
-                    noSleep.enable();
+                    sounds.play();
                     ticker.resume();
                 } else {
                     ticker.pause();
-                    noSleep.disable();
+                    sounds.pause();
                 }
             }
         };
