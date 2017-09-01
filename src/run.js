@@ -158,6 +158,11 @@ const
                 color: colors.progress.step
             }))
             .concat([
+                svg.circle({id: "edit", r: 0.15, cx: 0, cy: -0.4,
+                    fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01}),
+                svg.text({x: 0, y: -0.34, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
+                    fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2,
+                    "stroke-width": 0.001}, "?"),
                 svg.text({id: "time",
                     "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
                     fill: colors.text.time,
@@ -175,6 +180,10 @@ const
         ));
         ticker.on(onTick);
         return {
+            "edit": () => {
+                let initialSequence = sequenceSerializer.read(location.search.substr(1));
+                location = "edit.html#" + sequenceSerializer.write(initialSequence);
+            },
             "undefined": () => {
                 if (ticker.isPaused()) {
                     sounds.play();
