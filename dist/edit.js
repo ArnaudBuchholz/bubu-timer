@@ -897,8 +897,6 @@ module.exports = __webpack_require__(21);
 "use strict";
 
 
-/*global location*/
-
 __webpack_require__(2);
 
 var browser = __webpack_require__(3),
@@ -992,7 +990,7 @@ var browser = __webpack_require__(3),
             return sequenceEditor.remove();
         },
         run: function run() {
-            window.location = "run.html?" + encodedSequence();
+            location = "run.html?" + encodedSequence();
         }
     };
 };

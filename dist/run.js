@@ -1027,7 +1027,10 @@ var TOTAL_OUTER = 0.98,
         innerRadius: STEP_INNER,
         id: "step",
         color: colors.progress.step
-    })).concat([svg.text({ id: "time",
+    })).concat([svg.circle({ id: "edit", r: 0.15, cx: 0, cy: -0.4,
+        fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01 }), svg.text({ x: 0, y: -0.34, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
+        fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2,
+        "stroke-width": 0.001 }, "?"), svg.text({ id: "time",
         "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
         fill: colors.text.time,
         stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01 }, "00:00"), svg.text({ id: "ms",
@@ -1039,6 +1042,10 @@ var TOTAL_OUTER = 0.98,
         stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.01 }, "1 / 2"), svg.circle({ id: "pulse", cx: 0, cy: 0.85, r: 0, "stroke-width": 0, fill: "red", opacity: 0.5 })])));
     ticker.on(onTick);
     return {
+        "edit": function edit() {
+            var initialSequence = sequenceSerializer.read(location.search.substr(1));
+            location = "edit.html#" + sequenceSerializer.write(initialSequence);
+        },
         "undefined": function undefined() {
             if (ticker.isPaused()) {
                 sounds.play();
@@ -1159,7 +1166,8 @@ module.exports = function (elapsed, sequence) {
 "use strict";
 
 
-var _audio = void 0;
+var _audio = void 0,
+    _endRequested = false;
 
 var noop = function noop() {},
     _sprites = {
@@ -1189,6 +1197,15 @@ var noop = function noop() {},
     _addSource(audioElement, __webpack_require__(18), "ogg");
     _addSource(audioElement, __webpack_require__(19), "mp3");
     _audio = document.body.appendChild(audioElement);
+    _audio.addEventListener("timeupdate", function () {
+        var currentTime = _audio.currentTime;
+        if (currentTime >= _sprites.end.from) {
+            _endRequested = true;
+        }
+        if (currentTime < _sprites.blank.to && _endRequested) {
+            _audio.pause();
+        }
+    });
 },
     _play = function _play() {
     if (!_audio) {
