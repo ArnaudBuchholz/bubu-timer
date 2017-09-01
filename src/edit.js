@@ -1,7 +1,5 @@
 "use strict";
 
-/*global location*/
-
 require("./compatibility");
 
 const
@@ -91,7 +89,7 @@ const
             add: () => sequenceEditor.get().length < 16 ? sequenceEditor.add() : 0,
             remove: () => sequenceEditor.remove(),
             run: () => {
-                window.location = "run.html?" + encodedSequence();
+                location = "run.html?" + encodedSequence();
             }
         };
     };
