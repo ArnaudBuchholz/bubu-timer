@@ -1,7 +1,8 @@
 "use strict";
 
 let
-    _audio;
+    _media,
+    _endRequested = false;
 
 const
     noop = () => {},
@@ -34,23 +35,32 @@ const
         audioElement.loop = true;
         _addSource(audioElement, require("./res/sounds.ogg"), "ogg");
         _addSource(audioElement, require("./res/sounds.mp3"), "mp3");
-        _audio = document.body.appendChild(audioElement);
+        _media = document.body.appendChild(audioElement);
+        _media.addEventListener("timeupdate", () => {
+            const currentTime = _media.currentTime;
+            if (currentTime >= _sprites.end.from) {
+                _endRequested = true;
+            }
+            if (currentTime < _sprites.blank.to && _endRequested) {
+                _media.pause();
+            }
+        });
     },
 
     _play = () => {
-        if (!_audio) {
+        if (!_media) {
             _createAudio();
         }
-        _audio.play();
+        _media.play();
     },
 
     _pause = () => {
-        _audio.pause();
+        _media.pause();
     },
 
     _playSound = name => () => {
-        if (_audio) {
-            _audio.currentTime = _sprites[name].from;
+        if (_media) {
+            _media.currentTime = _sprites[name].from;
         }
     };
 
