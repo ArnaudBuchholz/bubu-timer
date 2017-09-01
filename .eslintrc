@@ -220,5 +220,8 @@
         "browser": true,
         "es6": true
     },
+    "globals": {
+        "location": true
+    },
     "extends": "eslint:recommended"
 }
