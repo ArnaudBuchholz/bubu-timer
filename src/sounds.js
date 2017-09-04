@@ -22,20 +22,11 @@ const
         }
     },
 
-    _addSource = (audioElement, data, type) => {
-        let source = document.createElement("source");
-        source.src = data;
-        source.type = `audio/${type}`;
-        audioElement.appendChild(source);
-    },
-
-    _createAudio = () => {
-        let audioElement = document.createElement("audio");
-        audioElement.id = "sounds";
-        audioElement.loop = true;
-        _addSource(audioElement, require("./res/sounds.ogg"), "ogg");
-        _addSource(audioElement, require("./res/sounds.mp3"), "mp3");
-        _media = document.body.appendChild(audioElement);
+    _createMedia = () => {
+        _media = document.createElement("video");
+        _media.loop = true;
+        _media.setAttribute("playsinline", "");
+        _media.setAttribute("src", require("./res/sounds.mp4"));
         _media.addEventListener("timeupdate", () => {
             const currentTime = _media.currentTime;
             if (currentTime >= _sprites.end.from) {
@@ -49,7 +40,7 @@ const
 
     _play = () => {
         if (!_media) {
-            _createAudio();
+            _createMedia();
         }
         _media.play();
     },
