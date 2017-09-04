@@ -1,8 +1,8 @@
 # Auto detect text files and perform LF normalization
 * text=auto eol=lf
 
-# PNG images
+# Media files
 *.png -text
-
-# MP3 sounds
 *.mp3 -text
+*.mp4 -text
+*.ogg -text
