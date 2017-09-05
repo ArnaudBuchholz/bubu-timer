@@ -1,15 +1,12 @@
 "use strict";
 
-require("./compatibility");
-
 const
-    browser = require("./browser"),
+    hash = require("./hash"),
     dom = require("./dom"),
     svg = require("./svg"),
     colors = require("./colors"),
     gradients = require("./gradients"),
     sequenceEditor = require("./sequence-editor").allocate(),
-    sequenceSerializer = require("./sequence-serializer"),
 
     digitProperties = {
         "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
@@ -33,8 +30,6 @@ const
         createButton({id: `dec${baseId}`, cx: x, x: x, y: -0.26, r: 0.08, cy: -0.31, label: "-"})
     ),
 
-    encodedSequence = () => sequenceSerializer.write(sequenceEditor.get()),
-
     refresh = (sequence/*, lengthChanged*/) => {
         let current = sequence[sequence.length - 1],
             list;
@@ -50,7 +45,7 @@ const
                 fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
             }, time));
         });
-        location.hash = encodedSequence();
+        hash.setSequence(sequenceEditor.get());
     },
 
     setup = () => {
@@ -74,7 +69,7 @@ const
                 svg.g({id: "list"})
             )
         ));
-        sequenceEditor.set(sequenceSerializer.read(location.hash.substr(1)));
+        sequenceEditor.set(hash.getSequence());
         sequenceEditor.on(refresh);
 
         return {
@@ -89,9 +84,11 @@ const
             add: () => sequenceEditor.get().length < 16 ? sequenceEditor.add() : 0,
             remove: () => sequenceEditor.remove(),
             run: () => {
-                location = "run.html?" + encodedSequence();
+                hash.setMode("run");
             }
         };
     };
 
-browser(setup);
+module.exports = {
+    setup: setup
+};
