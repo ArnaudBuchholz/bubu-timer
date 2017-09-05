@@ -1,20 +1,22 @@
 "use strict";
 
-/*eslint-disable no-alert*/
-
-require("./compatibility");
+let
+    sequence,
+    ticker,
+    options,
+    sequenceTotal,
+    lastSecond;
 
 const
     TOTAL_OUTER = 0.98,
     TOTAL_INNER = 0.88,
     STEP_OUTER  = 0.83,
     STEP_INNER  = 0.73,
-    browser = require("./browser"),
+    hash = require("./hash"),
     dom = require("./dom"),
     svg = require("./svg"),
     colors = require("./colors"),
     gradients = require("./gradients"),
-    sequenceSerializer = require("./sequence-serializer"),
     tickGenerator = require("./tick-generator"),
     tickConverter = require("./tick-converter"),
     tickFormatter = require("./tick-formatter"),
@@ -28,11 +30,6 @@ const
         || window.oRequestAnimationFrame        // Opera
         || window.msRequestAnimationFrame       // Internet Explorer
         || defaultRequestAnimFrame,
-
-    sequence = sequenceSerializer.read(location.search.substr(1)),
-    sequenceTotal = sequence.reduce((total, tick) => total + tick, 0),
-
-    ticker = tickGenerator.allocate(),
 
     ratio2Coords = (ratio, radius = 1, precision = 10000) => {
         let radian = ratio * 2 * Math.PI,
@@ -78,8 +75,22 @@ const
                     }, 100);
                 }
             };
-        update();
+        if (options.visualpulse) {
+            update();
+        }
         sounds.tick();
+    },
+
+    pulseOnSeconds = remaining => {
+        const second = Math.floor(remaining / 1000);
+        if (lastSecond !== second) {
+            lastSecond = second;
+            if (second < 5) {
+                pulse();
+            } else {
+                sounds.blank();
+            }
+        }
     },
 
     done = () => {
@@ -91,22 +102,18 @@ const
 
     onTick = tick => {
 
+        if (!sequence) {
+            return;
+        }
+
         const
             convertedTick = tickConverter(tick.elapsed, sequence),
             currentDuration = sequence[convertedTick.step % sequence.length],
             total = tick.elapsed / sequenceTotal % 1,
             step = 1 - convertedTick.remaining / currentDuration,
-            formattedRemaining = tickFormatter(convertedTick.remaining),
-            second = Math.floor(tick.elapsed / 1000);
+            formattedRemaining = tickFormatter(convertedTick.remaining);
 
-        if (onTick.lastSecond !== second) {
-            onTick.lastSecond = second;
-            if (convertedTick.remaining <= 5000 && convertedTick.step < sequence.length) {
-                pulse();
-            } else {
-                sounds.blank();
-            }
-        }
+        pulseOnSeconds(convertedTick.remaining);
 
         dom.setText("time", formattedRemaining.time);
         dom.setText("ms", `.${formattedRemaining.ms}`);
@@ -134,9 +141,21 @@ const
         ];
     },
 
+    reset = () => {
+        sequence = hash.getSequence();
+        ticker = tickGenerator.allocate();
+        options = Object.assign({
+            ms: true,
+            visualpulse: true
+        }, hash.getOptions());
+        sequenceTotal = sequence.reduce((total, tick) => total + tick, 0);
+        lastSecond = undefined;
+    },
+
     setup = () => {
+        reset();
         if (0 === sequence.length) {
-            alert("No sequence to play");
+            hash.setMode("edit");
             return {};
         }
         document.body.appendChild(svg({
@@ -178,11 +197,13 @@ const
                 svg.circle({id: "pulse", cx: 0, cy: 0.85, r: 0, "stroke-width": 0, fill: "red", opacity: 0.5})
             ])
         ));
+        if (options.ms === false) {
+            dom.hide("ms");
+        }
         ticker.on(onTick);
         return {
             "edit": () => {
-                let initialSequence = sequenceSerializer.read(location.search.substr(1));
-                location = "edit.html#" + sequenceSerializer.write(initialSequence);
+                hash.setMode("edit");
             },
             "undefined": () => {
                 if (ticker.isPaused()) {
@@ -196,4 +217,11 @@ const
         };
     };
 
-browser(setup);
+module.exports = {
+    setup: setup,
+    teardown: () => {
+        sequence = undefined;
+        ticker.pause();
+        sounds.pause();
+    }
+};
