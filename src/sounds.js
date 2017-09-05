@@ -5,7 +5,7 @@ let
     _endRequested = false;
 
 const
-    noop = () => {},
+    noop = require("./noop"),
 
     _sprites = {
         blank: {
@@ -46,7 +46,9 @@ const
     },
 
     _pause = () => {
-        _media.pause();
+        if (_media) {
+            _media.pause();
+        }
     },
 
     _playSound = name => () => {
