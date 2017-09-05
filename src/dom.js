@@ -21,12 +21,19 @@ const
         const node = _clear(id);
         node.appendChild(document.createTextNode(text));
         return node;
-    }
+    },
+
+    _setDisplay = (id, value) => _get(id).setAttribute("style", `display: ${value};`),
+
+    _show = id => _setDisplay(id, "block"),
+    _hide = id => _setDisplay(id, "none")
 ;
 
 module.exports = {
 
     clear: _clear,
-    setText: _setText
+    setText: _setText,
+    show: _show,
+    hide: _hide
 
 };
