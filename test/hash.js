@@ -16,6 +16,7 @@ describe("hash", function () {
         it("Get when empty", function () {
             location.hash = "";
             assert(hash.getMode("edit") === "edit");
+            assert(location.hash === "#edit");
         });
 
         it("Get when filled", function () {
