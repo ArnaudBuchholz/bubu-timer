@@ -4,15 +4,22 @@ const
     sequenceSerializer = require("./sequence-serializer"),
     _parse = () => location.hash ? location.hash.substr(1).split("/") : [],
     _update = parts => {
-        location.hash = "#" + parts.join("/")
+        location.hash = "#" + parts.join("/");
     },
-
-    _getMode = (defaultMode = "") => _parse()[0] || defaultMode,
 
     _setMode = mode => {
         const parts = _parse();
         parts[0] = mode;
         _update(parts);
+    },
+
+    _getMode = (defaultMode = "") => {
+        const result = _parse()[0];
+        if (result) {
+            return result;
+        }
+        _setMode(defaultMode);
+        return defaultMode;
     },
 
     _getSequence = () => {
