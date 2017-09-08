@@ -5,7 +5,8 @@ let
     ticker,
     options,
     sequenceTotal,
-    lastSecond;
+    lastSecond,
+    frameDelay;
 
 const
     TOTAL_OUTER = 0.98,
@@ -22,14 +23,14 @@ const
     tickFormatter = require("./tick-formatter"),
     sounds = require("./sounds"),
 
-    defaultRequestAnimFrame = callback => setTimeout(callback, 1000 / 60),
-
-    requestAnimFrame = window.requestAnimationFrame
+    verticalSync = window.requestAnimationFrame
         || window.webkitRequestAnimationFrame   // Chrome & Safari
         || window.mozRequestAnimationFrame      // Firefox
         || window.oRequestAnimationFrame        // Opera
         || window.msRequestAnimationFrame       // Internet Explorer
-        || defaultRequestAnimFrame,
+        || (callback => callback()),
+
+    nextFrame = callback => setTimeout(() => verticalSync(callback), frameDelay),
 
     ratio2Coords = (ratio, radius = 1, precision = 10000) => {
         let radian = ratio * 2 * Math.PI,
@@ -122,7 +123,7 @@ const
             document.getElementById("total").setAttribute("d", getCirclePath(total, TOTAL_OUTER, TOTAL_INNER));
             document.getElementById("step").setAttribute("d", getCirclePath(step, STEP_OUTER, STEP_INNER));
             dom.setText("stepOn", `${convertedTick.step + 1} / ${sequence.length}`);
-            requestAnimFrame(ticker.tick.bind(ticker));
+            nextFrame(ticker.tick.bind(ticker));
         } else {
             done();
         }
@@ -146,10 +147,18 @@ const
         ticker = tickGenerator.allocate();
         options = Object.assign({
             ms: true,
-            visualpulse: true
+            visualpulse: true,
+            battery: false
         }, hash.getOptions());
         sequenceTotal = sequence.reduce((total, tick) => total + tick, 0);
         lastSecond = undefined;
+        let frequency;
+        if (options.battery) {
+            frequency = 20;
+        } else {
+            frequency = 60;
+        }
+        frameDelay = Math.floor(1000 / frequency);
     },
 
     setup = () => {
