@@ -34,6 +34,7 @@ const
             }
             if (currentTime < _sprites.blank.to && _endRequested) {
                 _media.pause();
+                _endRequested = false;
             }
         });
     },
