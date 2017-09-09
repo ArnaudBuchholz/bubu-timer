@@ -5,7 +5,11 @@ let
     ticker,
     options,
     sequenceTotal,
-    lastSecond,
+    lastSecondDisplayed,
+    lastStepDisplayed,
+    radiusPrecision,
+    lastStepRadius,
+    lastTotalRadius,
     frameDelay;
 
 const
@@ -82,10 +86,11 @@ const
         sounds.tick();
     },
 
-    pulseOnSeconds = remaining => {
+    pulseOnSeconds = (remaining, formattedRemaining) => {
         const second = Math.floor(remaining / 1000);
-        if (lastSecond !== second) {
-            lastSecond = second;
+        if (lastSecondDisplayed !== second) {
+            dom.setText("time", formattedRemaining.time);
+            lastSecondDisplayed = second;
             if (second < 5) {
                 pulse();
             } else {
@@ -94,36 +99,61 @@ const
         }
     },
 
+    updateRemaining = remaining => {
+        let formattedRemaining;
+        if (options.ms) {
+            formattedRemaining = tickFormatter(remaining);
+            dom.setText("ms", `.${formattedRemaining.ms}`);
+        } else {
+            // Confusing without ms
+            formattedRemaining = tickFormatter(remaining + 999);
+        }
+        pulseOnSeconds(remaining, formattedRemaining);
+    },
+
+    updateTotalElapsed = radius => document.getElementById("total")
+        .setAttribute("d", getCirclePath(radius, TOTAL_OUTER, TOTAL_INNER)),
+
+    updateStepElapsed = radius => document.getElementById("step")
+        .setAttribute("d", getCirclePath(radius, STEP_OUTER, STEP_INNER)),
+
     done = () => {
-        document.getElementById("total").setAttribute("d", getCirclePath(0, TOTAL_OUTER, TOTAL_INNER));
-        document.getElementById("step").setAttribute("d", getCirclePath(0, STEP_OUTER, STEP_INNER));
+        updateTotalElapsed(0);
+        updateStepElapsed(0);
         dom.setText("stepOn", "done.");
         sounds.end();
     },
 
-    onTick = tick => {
+    updateElapsed = (tick, convertedTick) => {
+        const
+            totalRadius = Math.floor(radiusPrecision * tick.elapsed / sequenceTotal) / radiusPrecision,
+            stepRadius = 1 - Math.floor(radiusPrecision * convertedTick.remaining / sequence[convertedTick.step % sequence.length]) / radiusPrecision;
+        if (lastTotalRadius !== totalRadius) {
+            lastTotalRadius = totalRadius;
+            updateTotalElapsed(totalRadius);
+        }
+        if (lastStepRadius !== stepRadius) {
+            lastStepRadius = stepRadius;
+            updateStepElapsed(stepRadius);
+        }
+        if (convertedTick.step !== lastStepDisplayed) {
+            lastStepDisplayed = convertedTick.step;
+            dom.setText("stepOn", `${convertedTick.step + 1} / ${sequence.length}`);
+        }
+    },
 
+    onTick = tick => {
         if (!sequence) {
             return;
         }
-
-        const
-            convertedTick = tickConverter(tick.elapsed, sequence),
-            currentDuration = sequence[convertedTick.step % sequence.length],
-            total = tick.elapsed / sequenceTotal % 1,
-            step = 1 - convertedTick.remaining / currentDuration,
-            formattedRemaining = tickFormatter(convertedTick.remaining);
-
-        pulseOnSeconds(convertedTick.remaining);
-
-        dom.setText("time", formattedRemaining.time);
-        dom.setText("ms", `.${formattedRemaining.ms}`);
+        const convertedTick = tickConverter(tick.elapsed, sequence);
+        updateRemaining(convertedTick.remaining);
 
         if (convertedTick.step < sequence.length) {
-            document.getElementById("total").setAttribute("d", getCirclePath(total, TOTAL_OUTER, TOTAL_INNER));
-            document.getElementById("step").setAttribute("d", getCirclePath(step, STEP_OUTER, STEP_INNER));
-            dom.setText("stepOn", `${convertedTick.step + 1} / ${sequence.length}`);
-            nextFrame(ticker.tick.bind(ticker));
+            updateElapsed(tick, convertedTick);
+            if (!ticker.isPaused()) {
+                nextFrame(ticker.tick.bind(ticker));
+            }
         } else {
             done();
         }
@@ -146,17 +176,24 @@ const
         sequence = hash.getSequence();
         ticker = tickGenerator.allocate();
         options = Object.assign({
-            ms: true,
             visualpulse: true,
             battery: false
         }, hash.getOptions());
+        if (options.ms === undefined) {
+            options.ms = !options.battery;
+        }
         sequenceTotal = sequence.reduce((total, tick) => total + tick, 0);
-        lastSecond = undefined;
+        lastSecondDisplayed = undefined;
+        lastStepDisplayed = undefined;
+        lastStepRadius = undefined;
+        lastTotalRadius = undefined;
         let frequency;
         if (options.battery) {
             frequency = 20;
+            radiusPrecision = 10;
         } else {
             frequency = 60;
+            radiusPrecision = 1000;
         }
         frameDelay = Math.floor(1000 / frequency);
     },
