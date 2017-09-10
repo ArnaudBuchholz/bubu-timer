@@ -124,10 +124,12 @@ const
         sounds.end();
     },
 
+    roundRadius = radius => Math.floor(radiusPrecision * radius) / radiusPrecision,
+
     updateElapsed = (tick, convertedTick) => {
         const
-            totalRadius = Math.floor(radiusPrecision * tick.elapsed / sequenceTotal) / radiusPrecision,
-            stepRadius = 1 - Math.floor(radiusPrecision * convertedTick.remaining / sequence[convertedTick.step % sequence.length]) / radiusPrecision;
+            totalRadius = roundRadius(tick.elapsed / sequenceTotal),
+            stepRadius = 1 - roundRadius(convertedTick.remaining / sequence[convertedTick.step % sequence.length]);
         if (lastTotalRadius !== totalRadius) {
             lastTotalRadius = totalRadius;
             updateTotalElapsed(totalRadius);
@@ -172,30 +174,38 @@ const
         ];
     },
 
-    reset = () => {
-        sequence = hash.getSequence();
-        ticker = tickGenerator.allocate();
-        options = Object.assign({
-            visualpulse: true,
-            battery: false
-        }, hash.getOptions());
-        if (options.ms === undefined) {
-            options.ms = !options.battery;
-        }
-        sequenceTotal = sequence.reduce((total, tick) => total + tick, 0);
+    undefineLasts = () => {
         lastSecondDisplayed = undefined;
         lastStepDisplayed = undefined;
         lastStepRadius = undefined;
         lastTotalRadius = undefined;
+    },
+
+    defaultOption = (name, value) => {
+        if (options[name] === undefined) {
+            options[name] = value;
+        }
+    },
+
+    reset = () => {
+        sequence = hash.getSequence();
+        ticker = tickGenerator.allocate();
+        options = Object.assign({
+            battery: false
+        }, hash.getOptions());
+        defaultOption("ms", !options.battery);
+        defaultOption("visualpulse", !options.battery);
+        sequenceTotal = sequence.reduce((total, tick) => total + tick, 0);
         let frequency;
         if (options.battery) {
             frequency = 20;
-            radiusPrecision = 10;
+            radiusPrecision = 100;
         } else {
             frequency = 60;
             radiusPrecision = 1000;
         }
         frameDelay = Math.floor(1000 / frequency);
+        undefineLasts();
     },
 
     setup = () => {
