@@ -7,19 +7,28 @@ const
     colors = require("./colors"),
     gradients = require("./gradients"),
     sequenceEditor = require("./sequence-editor").allocate(),
+    runIcon = require("./res/run.svg"),
 
     digitProperties = {
         "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
         fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
     },
 
-    createButton = ({id, cx, x, y, label, r = 0.15, cy = 0.7}) => [
-        svg.circle({id: id, r: r, cx: cx, cy: cy,
-            fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01}),
-        svg.text({x: x, y: y, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
-            fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001},
-        label)
-    ],
+    createButton = ({id, cx, x, y, label = "", r = 0.15, cy = 0.7, icon = ""}) => {
+        let result = [
+                svg.circle({id: id, r: r, cx: cx, cy: cy,
+                    fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01})
+            ],
+            r2 = 0.7 * r;
+        if (icon) {
+            result.push(svg.image({x: x - r2, y: cy - r2, "xlink:href": icon, height: r2 * 2, width: r2 * 2}));
+        } else {
+            result.push(svg.text({x: x, y: y, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
+                fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001},
+            label));
+        }
+        return result;
+    },
 
     createDigit = (x, baseId) => [
         svg.rect({x: x - 0.1, y: -0.8, width: 0.2, height: 0.4,
@@ -65,7 +74,7 @@ const
             .concat(
                 createButton({id: "remove", cx: -0.4, x: -0.4, y: 0.75, label: "-"}),
                 createButton({id: "add", cx: 0, x: 0, y: 0.77, label: "+"}),
-                createButton({id: "run", cx: 0.4, x: 0.40, y: 0.77, label: "Go"}),
+                createButton({id: "run", cx: 0.4, x: 0.40, y: 0.77, icon: runIcon}),
                 svg.g({id: "list"})
             )
         ));
