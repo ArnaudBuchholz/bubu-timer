@@ -26,7 +26,8 @@ module.exports = {
             ".json",
             ".mp3",
             ".ogg",
-            ".mp4"
+            ".mp4",
+            ".svg"
         ],
     },
 
@@ -43,7 +44,7 @@ module.exports = {
                 loader: "eslint-loader"
             }]
         }, {
-            test: /\.mp3|\.ogg|\.mp4$/,
+            test: /\.mp3|\.ogg|\.mp4|\.svg$/,
             use: [{
                 loader: "url-loader",
             }]
