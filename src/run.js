@@ -26,6 +26,7 @@ const
     tickConverter = require("./tick-converter"),
     tickFormatter = require("./tick-formatter"),
     sounds = require("./sounds"),
+    isMobile = require("./mobile"),
 
     verticalSync = window.requestAnimationFrame
         || window.webkitRequestAnimationFrame   // Chrome & Safari
@@ -190,9 +191,8 @@ const
     reset = () => {
         sequence = hash.getSequence();
         ticker = tickGenerator.allocate();
-        options = Object.assign({
-            battery: false
-        }, hash.getOptions());
+        options = hash.getOptions();
+        defaultOption("battery", isMobile);
         defaultOption("ms", !options.battery);
         defaultOption("visualpulse", !options.battery);
         sequenceTotal = sequence.reduce((total, tick) => total + tick, 0);
