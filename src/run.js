@@ -122,6 +122,7 @@ const
     done = () => {
         updateTotalElapsed(0);
         updateStepElapsed(0);
+        dom.setText("time", "00:00");
         dom.setText("stepOn", "done.");
         sounds.end();
     },
@@ -199,7 +200,7 @@ const
         sequenceTotal = sequence.reduce((total, tick) => total + tick, 0);
         let frequency;
         if (options.battery) {
-            frequency = 20;
+            frequency = 10;
             radiusPrecision = 100;
         } else {
             frequency = 60;
