@@ -8,16 +8,19 @@ const
     editIcon = require("./res/settings.svg"),
 
     forkMeLabel = "Fork me on GitHub",
+    forkMeAttributes = {
+        "class": "github-fork-ribbon",
+        href: "https://github.com/ArnaudBuchholz/bubu-timer",
+        "data-ribbon": forkMeLabel,
+        target: "_blank",
+        title: forkMeLabel
+    },
 
     setup = () => {
         const forkMeLink = document.createElement("a");
-        forkMeLink.className = "github-fork-ribbon";
-        forkMeLink.href = "https://github.com/ArnaudBuchholz/bubu-timer";
-        forkMeLink.setAttribute("data-ribbon", forkMeLabel);
-        forkMeLink.title = forkMeLabel;
+        Object.keys(forkMeAttributes).forEach(name => forkMeLink.setAttribute(name, forkMeAttributes[name ]));
         forkMeLink.innerHTML = forkMeLabel;
 
-        document.body.appendChild(forkMeLink);
         document.body.appendChild(svg({
             width: "100%",
             height: "100%",
@@ -30,6 +33,7 @@ const
                 svg.image({x: -0.1, y: 0.75, width: 0.2, height: 0.2, "xlink:href": editIcon})
             ])
         ));
+        document.body.appendChild(forkMeLink);
 
         return {
             edit: () => hash.setMode("edit")
