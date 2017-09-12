@@ -27,7 +27,7 @@ const
     tickFormatter = require("./tick-formatter"),
     sounds = require("./sounds"),
     isMobile = require("./mobile"),
-    settingsIcon = require("./res/settings.svg"),
+    editIcon = require("./res/settings.svg"),
 
     verticalSync = window.requestAnimationFrame
         || window.webkitRequestAnimationFrame   // Chrome & Safari
@@ -235,9 +235,9 @@ const
                 color: colors.progress.step
             }))
             .concat([
-                svg.circle({id: "edit", r: 0.15, cx: 0, cy: -0.4,
+                svg.circle({id: "edit", r: 0.15, cx: 0, cy: 0.85,
                     fill: colors.circle.light, stroke: "url(#innerBorder)", "stroke-width": 0.01}),
-                svg.image({x: -0.1, y: -0.5, width: 0.2, height: 0.2, "xlink:href": settingsIcon}),
+                svg.image({x: -0.1, y: 0.75, width: 0.2, height: 0.2, "xlink:href": editIcon}),
                 svg.text({id: "time",
                     "font-family": "Arial", "font-size": 0.3, x: 0, y: 0.1, "text-anchor": "middle",
                     fill: colors.text.time,
