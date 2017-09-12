@@ -12,6 +12,7 @@ const
     dom = require("./dom"),
     EDIT_HASH = "edit",
     RUN_HASH = "run",
+    ABOUT_HASH = "about",
     _modes = {},
 
     hashChange = () => {
@@ -29,6 +30,7 @@ _modes["undefined"] = {
 };
 _modes[EDIT_HASH] = require("./edit");
 _modes[RUN_HASH] = require("./run");
+_modes[ABOUT_HASH] = require("./about");
 
 [
     "load",
