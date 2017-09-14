@@ -11,7 +11,9 @@ const
     },
 
     _notify = (editor, lengthChanged) => {
-        editor.callback(editor.sequence.map(tick => tickFormatter(tick).time), lengthChanged || false);
+        const sequence = editor.sequence;
+        editor.callback(sequence.map(tick => tickFormatter(tick).time),
+            tickFormatter(sequence.reduce((sum, step) => sum + step, 0)).time);
     },
 
     _attach = (editor, callback) => {
@@ -27,25 +29,24 @@ const
 
     _add = (editor) => {
         editor.sequence.push(0);
-        _notify(editor, true);
+        _notify(editor);
     },
 
     _remove = (editor) => {
-        let sequence = editor.sequence,
-            hasRemainingItems = sequence.length > 1;
-        if (hasRemainingItems) {
+        let sequence = editor.sequence;
+        if (sequence.length > 1) {
             sequence.pop();
         } else {
             sequence[0] = 0;
         }
-        _notify(editor, hasRemainingItems);
+        _notify(editor);
     },
 
     _get = (editor) => editor.sequence,
 
     _set = (editor, sequence) => {
         editor.sequence = Array.isArray(sequence) && sequence.length ? [].concat(sequence) : [0];
-        _notify(editor, true);
+        _notify(editor);
     };
 
 module.exports = {
