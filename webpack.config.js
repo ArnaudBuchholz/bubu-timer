@@ -58,20 +58,15 @@ module.exports = {
         }],
     },
 
-    plugins: []
-        .concat(
-            release
-                ? [
-                    new webpack.optimize.UglifyJsPlugin({
-                        compress: {
-                            warnings: false,
-                        },
-                    }),
-                ]
-                : []
-        ),
+    plugins: [
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false,
+            },
+        })
+    ]
 
-    node: {
-        fs: 'empty'
-    }
+    // node: {
+    //     fs: 'empty'
+    // }
 };
