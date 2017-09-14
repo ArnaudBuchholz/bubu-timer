@@ -14,9 +14,10 @@ describe("sequence-editor", () => {
 
     it("notifies of UI refreshes", () => {
         let editor = sequenceEditor.allocate();
-        editor.on(sequence => {
+        editor.on((sequence, total) => {
             assert(sequence.length === 1);
             assert(sequence[0] === "00:00");
+            assert(total === "00:00");
         });
     });
 
@@ -31,15 +32,17 @@ describe("sequence-editor", () => {
         playScenario = (label, scenario, expectedSequence) => {
             it(label, () => {
                 let expected = ["00:00"],
-                    expectedLengthChanged = false,
+                    expectedTotal,
                     editor = sequenceEditor.allocate(),
                     callbackCount = 0;
-                editor.on((sequence, lengthChanged) => {
+                editor.on((sequence, total) => {
                     assert(sequence.length === expected.length);
                     expected.forEach((ms, pos) => {
                         assert(sequence[pos] === ms);
                     });
-                    assert(expectedLengthChanged === lengthChanged);
+                    if (expectedTotal) {
+                        assert(expectedTotal === total);
+                    }
                     ++callbackCount;
                 });
                 callbackCount = 0;
@@ -47,9 +50,7 @@ describe("sequence-editor", () => {
                     assert(callbackCount === index);
                     expected = item.expected;
                     let action = Object.keys(item).filter(name => name !== "expected")[0];
-                    expectedLengthChanged = undefined !== item.expectedLengthChanged
-                        ? item.expectedLengthChanged
-                        : -1 !== ["add", "remove", "set"].indexOf(action);
+                    expectedTotal = item.expectedTotal;
                     actions[action](editor, item[action], item);
                     assert(callbackCount === index + 1);
                 });
@@ -67,58 +68,74 @@ describe("sequence-editor", () => {
 
         playScenario("scenario 1", [{
             inc: 1,
-            expected: ["00:01"]
+            expected: ["00:01"],
+            expectedTotal: "00:01"
         }, {
             inc: 1,
-            expected: ["00:02"]
+            expected: ["00:02"],
+            expectedTotal: "00:02"
         }, {
             inc: 1,
-            expected: ["00:03"]
+            expected: ["00:03"],
+            expectedTotal: "00:03"
         }, {
             inc: 10,
-            expected: ["00:13"]
+            expected: ["00:13"],
+            expectedTotal: "00:13"
         }, {
             inc: 60,
-            expected: ["01:13"]
+            expected: ["01:13"],
+            expectedTotal: "01:13"
         }, {
             inc: 3600,
-            expected: ["61:13"]
+            expected: ["61:13"],
+            expectedTotal: "61:13"
         }], [3673000]);
 
         playScenario("scenario 2", [{
             inc: 10,
-            expected: ["00:10"]
+            expected: ["00:10"],
+            expectedTotal: "00:10"
         }, {
             dec: 1,
-            expected: ["00:09"]
+            expected: ["00:09"],
+            expectedTotal: "00:09"
         }, {
             dec: 1,
-            expected: ["00:08"]
+            expected: ["00:08"],
+            expectedTotal: "00:08"
         }], [8000]);
 
         playScenario("scenario 3 (never below 0)", [{
             inc: 10,
-            expected: ["00:10"]
+            expected: ["00:10"],
+            expectedTotal: "00:10"
         }, {
             dec: 15,
-            expected: ["00:00"]
+            expected: ["00:00"],
+            expectedTotal: "00:00"
         }, {
             inc: 1,
-            expected: ["00:01"]
+            expected: ["00:01"],
+            expectedTotal: "00:01"
         }, {
             inc: 60,
-            expected: ["01:01"]
+            expected: ["01:01"],
+            expectedTotal: "01:01"
         }, {
             dec: 3600,
-            expected: ["00:00"]
+            expected: ["00:00"],
+            expectedTotal: "00:00"
         }], [0]);
 
         playScenario("scenario 4 (never over 99:59)", [{
             inc: 3600,
-            expected: ["60:00"]
+            expected: ["60:00"],
+            expectedTotal: "60:00"
         }, {
             inc: 3600,
-            expected: ["99:59"]
+            expected: ["99:59"],
+            expectedTotal: "99:59"
         }], [5999000]);
 
     });
@@ -127,16 +144,20 @@ describe("sequence-editor", () => {
 
         playScenario("scenario 1", [{
             inc: 60,
-            expected: ["01:00"]
+            expected: ["01:00"],
+            expectedTotal: "01:00"
         }, {
             add: true,
-            expected: ["01:00", "00:00"]
+            expected: ["01:00", "00:00"],
+            expectedTotal: "01:00"
         }, {
             inc: 30,
-            expected: ["01:00", "00:30"]
+            expected: ["01:00", "00:30"],
+            expectedTotal: "01:30"
         }, {
             dec: 10,
-            expected: ["01:00", "00:20"]
+            expected: ["01:00", "00:20"],
+            expectedTotal: "01:20"
         }], [60000, 20000]);
 
     });
@@ -145,34 +166,42 @@ describe("sequence-editor", () => {
 
         playScenario("scenario 1", [{
             inc: 60,
-            expected: ["01:00"]
+            expected: ["01:00"],
+            expectedTotal: "01:00"
         }, {
             add: true,
-            expected: ["01:00", "00:00"]
+            expected: ["01:00", "00:00"],
+            expectedTotal: "01:00"
         }, {
             inc: 30,
-            expected: ["01:00", "00:30"]
+            expected: ["01:00", "00:30"],
+            expectedTotal: "01:30"
         }, {
             remove: true,
-            expected: ["01:00"]
+            expected: ["01:00"],
+            expectedTotal: "01:00"
         }], [60000]);
 
         playScenario("scenario 2 (always one item)", [{
             inc: 60,
-            expected: ["01:00"]
+            expected: ["01:00"],
+            expectedTotal: "01:00"
         }, {
             add: true,
-            expected: ["01:00", "00:00"]
+            expected: ["01:00", "00:00"],
+            expectedTotal: "01:00"
         }, {
             inc: 30,
-            expected: ["01:00", "00:30"]
+            expected: ["01:00", "00:30"],
+            expectedTotal: "01:30"
         }, {
             remove: true,
-            expected: ["01:00"]
+            expected: ["01:00"],
+            expectedTotal: "01:00"
         }, {
             remove: true,
             expected: ["00:00"],
-            expectedLengthChanged: false
+            expectedTotal: "00:00"
         }], [0]);
 
     });
@@ -181,15 +210,18 @@ describe("sequence-editor", () => {
 
         playScenario("scenario 1", [{
             set: [60000],
-            expected: ["01:00"]
+            expected: ["01:00"],
+            expectedTotal: "01:00"
         }, {
             inc: 30,
-            expected: ["01:30"]
+            expected: ["01:30"],
+            expectedTotal: "01:30"
         }], [90000]);
 
         playScenario("scenario 2", [{
             set: [],
-            expected: ["00:00"]
+            expected: ["00:00"],
+            expectedTotal: "00:00"
         }], [0]);
 
     });
