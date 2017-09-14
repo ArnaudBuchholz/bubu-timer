@@ -10,7 +10,7 @@ const
         };
     },
 
-    _notify = (editor, lengthChanged) => {
+    _notify = editor => {
         const sequence = editor.sequence;
         editor.callback(sequence.map(tick => tickFormatter(tick).time),
             tickFormatter(sequence.reduce((sum, step) => sum + step, 0)).time);
