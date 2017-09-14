@@ -9,11 +9,30 @@ const
     sequenceEditor = require("./sequence-editor").allocate(),
     runIcon = require("./res/run.svg"),
     aboutIcon = require("./res/email.svg"),
+    durationIcon = require("./res/power.svg"),
 
-    digitProperties = {
-        "font-family": "Arial", "font-size": 0.25, "text-anchor": "middle",
-        fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
+    commonTextProperties = {
+        "font-family": "Arial",
+        fill: colors.text.step,
+        stroke: "url(#innerBorder)",
+        "stroke-opacity": 0.2,
+        "stroke-width": 0.001
     },
+
+    buttonProperties = Object.assign({
+        "font-size": 0.2,
+        "text-anchor": "middle"
+    }, commonTextProperties),
+
+    digitProperties = Object.assign({
+        "font-size": 0.25,
+        "text-anchor": "middle"
+    }, commonTextProperties),
+
+    stepProperties = Object.assign({
+        "font-size": 0.15,
+        "text-anchor": "end"
+    }, commonTextProperties),
 
     createButton = ({id, cx, y, label = "", r = 0.15, cy = 0.85, icon = ""}) => {
         let result = [
@@ -24,9 +43,7 @@ const
         if (icon) {
             result.push(svg.image({x: cx - r2, y: cy - r2, "xlink:href": icon, height: r2 * 2, width: r2 * 2}));
         } else {
-            result.push(svg.text({x: cx, y: y, "font-family": "Arial", "font-size": 0.2, "text-anchor": "middle",
-                fill: colors.text.step, stroke: "url(#outerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001},
-            label));
+            result.push(svg.text(Object.assign({x: cx, y: y}, buttonProperties), label));
         }
         return result;
     },
@@ -40,20 +57,19 @@ const
         createButton({id: `dec${baseId}`, cx: x, x: x, y: -0.26, r: 0.08, cy: -0.31, label: "-"})
     ),
 
-    refresh = (sequence/*, lengthChanged*/) => {
+    refresh = (sequence, total) => {
         let current = sequence[sequence.length - 1],
             list;
+        dom.setText("total", total);
         [0, 1, 3, 4].forEach((pos, digit) => {
             dom.setText(`dig${digit}`, current.substr(pos, 1));
         });
         list = dom.clear("list");
         sequence.forEach((time, index) => {
-            list.appendChild(svg.text({
+            list.appendChild(svg.text(Object.assign({
                 x: -0.5 + 0.45 * (index % 4),
-                y: 0.15 * Math.floor(index / 4),
-                "font-family": "Arial", "font-size": 0.15, "text-anchor": "end",
-                fill: colors.text.step, stroke: "url(#innerBorder)", "stroke-opacity": 0.2, "stroke-width": 0.001
-            }, time));
+                y: 0.15 * Math.floor(index / 4)
+            }, stepProperties), time));
         });
         hash.setSequence(sequenceEditor.get());
     },
@@ -66,11 +82,14 @@ const
             style: `background-color: ${colors.background};`
         }, [gradients()]
             .concat(
-                createDigit(-0.4, 0),
-                createDigit(-0.15, 1),
-                svg.text(Object.assign({x: 0, y: -0.52}, digitProperties), ":"),
-                createDigit(0.15, 2),
-                createDigit(0.4, 3)
+                createDigit(-0.7, 0),
+                createDigit(-0.45, 1),
+                svg.text(Object.assign({x: -0.1, y: -0.52}, digitProperties), ":"),
+                createDigit(-0.15, 2),
+                createDigit(0.1, 3),
+                svg.image({x: 0.2, y: -0.72, "xlink:href": durationIcon, height: 0.2, width: 0.2}),
+                svg.text(Object.assign({id: "total", x: 0.4, y: -0.57,
+                    "font-size": 0.15, "text-anchor": "start"}, commonTextProperties), "00:00")
             )
             .concat(
                 createButton({id: "about", cx: -0.6, icon: aboutIcon}),
