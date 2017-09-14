@@ -4,6 +4,7 @@ let
     _mapping = {};
 
 const
+    appInfo = require("../package.json"),
     noop = require("./noop"),
 
     coords = e => e.touches
@@ -36,6 +37,9 @@ window.addEventListener("load", () => {
     let
         touchDisabled = true,
         touchEvent;
+
+    document.title = `.::${appInfo.name.toUpperCase()}::.`;
+    document.body.id = "body";
 
     window.addEventListener("click", e => touchDisabled ? click(e) : 0, true);
     window.addEventListener("touchstart", e => {
