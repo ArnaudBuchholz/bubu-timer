@@ -26,6 +26,11 @@ const
     };
 
 require("./res/stylesheet.css");
+if (window.navigator.userAgent.indexOf("MSIE ") === -1) {
+    require("github-fork-ribbon-css/gh-fork-ribbon.css");
+} else {
+    require("github-fork-ribbon-css/gh-fork-ribbon.ie.css");
+}
 
 window.addEventListener("load", () => {
     let
