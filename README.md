@@ -1,10 +1,11 @@
 # bubu-timer
-A configurable app-like timer
+A configurable app-like timer.
+Check the [latest release](http://arnaudbuchholz.github.io/bubu-timer/index.html#about/0)
 
 # How to
 
 ## Instal
-* Install dependencies: `npm install` 
+* Install dependencies: `npm install`
 * Install [webpack](https://webpack.js.org/)
 
 ## Test
